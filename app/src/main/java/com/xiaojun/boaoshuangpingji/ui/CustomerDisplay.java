@@ -3,7 +3,6 @@ package com.xiaojun.boaoshuangpingji.ui;
 import android.app.Activity;
 import android.app.Presentation;
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -16,7 +15,6 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Display;
@@ -27,7 +25,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.arcsoft.ageestimation.ASAE_FSDKAge;
@@ -67,7 +67,7 @@ import com.xiaojun.boaoshuangpingji.utils.FaceDB;
 import com.xiaojun.boaoshuangpingji.utils.GlideCircleTransform;
 import com.xiaojun.boaoshuangpingji.utils.GsonUtil;
 import com.xiaojun.boaoshuangpingji.utils.Utils;
-import com.xiaojun.boaoshuangpingji.utils.WrapContentLinearLayoutManager;
+import com.yatoooon.screenadaptation.ScreenAdapterTools;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -130,21 +130,18 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
     FRAbsLoop mFRAbsLoop = null;
     AFT_FSDKFace mAFT_FSDKFace = null;
     Handler mHandler;
-    private RecyclerView recyclerView2;
-    private WrapContentLinearLayoutManager manager2;
+
     private BlockingQueue<String> basket = new LinkedBlockingQueue<String>(5);
     private static Vector<MenBean> menBeansList=new Vector<>();
-
     private static boolean isA=true;
-    private static int  faceSize=1;
-    private ImagesAdapter adapter;
-    private ShowAdapter showAdapter;
+
 
     private static Vector<Bitmap> bitmapList=new Vector<>();
 
     private final int TIMEOUT=1000*30;
     private  String screen_token=null;
-
+    private LinearLayout linearLayout;
+    private ScrollView scrollView;
 
 
     public  Handler handler=new Handler(new Handler.Callback() {
@@ -156,7 +153,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                 case 999:
 
                     if (menBeansList.size()>0){
-                        showAdapter.notifyItemRemoved(0);
+
                         menBeansList.remove(0);
                     }
 
@@ -180,8 +177,8 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                             if (a == 0) {
                                 menBeansList.add(dataBean);
                                 int i1 = menBeansList.size();
-                                adapter.notifyItemInserted(i1);
-                                manager2.scrollToPosition(i1 - 1);
+//                                adapter.notifyItemInserted(i1);
+//                                manager2.scrollToPosition(i1 - 1);
 
                                 new Thread(new Runnable() {
                                     @Override
@@ -372,25 +369,17 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
         dh = Utils.getDisplaySize(mContext).y;
 
         setContentView(R.layout.view_display_customer);
-        Log.d("CustomerDisplay", "付总");
+        //ScreenAdapterTools.getInstance().reset(this);//如果希望android7.0分屏也适配的话,加上这句
+        //在setContentView();后面加上适配语句
+        ScreenAdapterTools.getInstance().loadView(getWindow().getDecorView());
 
+        linearLayout=findViewById(R.id.linearLayout);
+        scrollView=findViewById(R.id.scrollView);
         mGLSurfaceView = (CameraGLSurfaceView) findViewById(R.id.glsurfaceView);
         mGLSurfaceView.setOnTouchListener(this);
         mSurfaceView = (CameraSurfaceView) findViewById(R.id.surfaceView);
         mSurfaceView.setOnCameraListener(this);
         mSurfaceView.debug_print_fps(false, false);
-        adapter=new ImagesAdapter(bitmapList);
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-        WrapContentLinearLayoutManager linearLayoutManager = new WrapContentLinearLayoutManager(mContext, LinearLayoutManager.VERTICAL, false,this);
-        recyclerView.setLayoutManager(linearLayoutManager);
-        recyclerView.setAdapter(adapter);
-
-        recyclerView2 = (RecyclerView) findViewById(R.id.recyclerView2);
-        manager2 = new WrapContentLinearLayoutManager(mContext,LinearLayoutManager.HORIZONTAL,false,this);
-        recyclerView2.setLayoutManager(manager2);
-
-        showAdapter = new ShowAdapter(menBeansList);
-        recyclerView2.setAdapter(showAdapter);
 
         AFT_FSDKError err = engine.AFT_FSDK_InitialFaceEngine(FaceDB.appid, FaceDB.ft_key, AFT_FSDKEngine.AFT_OPF_0_HIGHER_EXT, 16, 5);
         Log.d(TAG, "AFT_FSDK_InitialFaceEngine =" + err.getCode());
@@ -407,102 +396,23 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
         error1 = mGenderEngine.ASGE_FSDK_GetVersion(mGenderVersion);
         Log.d(TAG, "ASGE_FSDK_GetVersion:" + mGenderVersion.toString() + "," + error1.getCode());
 
-        RelativeLayout.LayoutParams  params1= (RelativeLayout.LayoutParams) recyclerView2.getLayoutParams();
-        params1.height=dh*2/3;
-        recyclerView2.setLayoutParams(params1);
-        recyclerView2.invalidate();
+//        RelativeLayout.LayoutParams  params1= (RelativeLayout.LayoutParams) recyclerView2.getLayoutParams();
+//        params1.height=dh*2/3;
+//        recyclerView2.setLayoutParams(params1);
+//        recyclerView2.invalidate();
 
         mFRAbsLoop = new FRAbsLoop();
         mFRAbsLoop.start();
 
-
-
     }
 
 
 
-    /**
-     * 设置右侧显示的广告
-     */
-    public void setAdvertisement(){
-        //
-    }
-
-    public class ShowAdapter extends RecyclerView.Adapter<ShowAdapter.ViewHolder> {
-        private List<MenBean> datas;
-
-//    private ClickIntface clickIntface;
-//    public void setClickIntface(ClickIntface clickIntface){
-//        this.clickIntface=clickIntface;
-//    }
-
-        private ShowAdapter(List<MenBean> datas) {
-            this.datas = datas;
-        }
-        //创建新View，被LayoutManager所调用
-        @Override
-        public ShowAdapter.ViewHolder onCreateViewHolder(ViewGroup viewGroup, int viewType) {
-            View view = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.tanchuang_item6,viewGroup,false);
-            return new ShowAdapter.ViewHolder(view);
-        }
-        //将数据与界面进行绑定的操作
-        @Override
-        public void onBindViewHolder(ShowAdapter.ViewHolder viewHolder, final int position) {
-            switch (datas.get(position).getPerson().getTag().getSubject_type()){
-                case 0:
-                    //员工
-                    viewHolder.name.setText(datas.get(position).getPerson().getTag().getName());
-                    viewHolder.zhuangtai.setText("员工");
-                    viewHolder.bg.setBackgroundResource(R.drawable.pufa_ld);
-                    Glide.with(mContext)
-                            //.load(zhuji+item.getTouxiang())
-                            .load("http://192.168.2.64"+datas.get(position).getPerson().getTag().getAvatar())
-                            //.apply(myOptions2)
-                            .transform(new GlideCircleTransform(mContext,2, Color.parseColor("#ffffffff")))
-                            //	.transform(new GlideRoundTransform(MyApplication.getAppContext(), 6))
-                            .into(viewHolder.touxiang);
-                    RecyclerView.LayoutParams lp = (RecyclerView.LayoutParams) viewHolder.bg.getLayoutParams();
-                    lp.leftMargin=10;
-                    lp.width=dw/3-10;
-                    viewHolder.bg.setLayoutParams(lp);
-                    viewHolder.bg.invalidate();
-
-                    break;
-
-            }
-
-
-
-        }
-        //获取数据的数量
-        @Override
-        public int getItemCount() {
-            return datas.size();
-        }
-        //自定义的ViewHolder，持有每个Item的的所有界面元素
-        class ViewHolder extends RecyclerView.ViewHolder {
-            private ImageView touxiang;
-            private TextView name,zhuangtai;
-            private RelativeLayout bg;
-
-            private ViewHolder(View view){
-                super(view);
-                touxiang = (ImageView) view.findViewById(R.id.touxiang);
-                name = (TextView) view.findViewById(R.id.name33);
-                zhuangtai = (TextView) view.findViewById(R.id.zhuangtai33);
-                bg=(RelativeLayout)view.findViewById(R.id.ffflll);
-
-
-            }
-        }
-
-    }
 
 
     @Override
     protected void onStop() {
         isA=true;
-        faceSize=1;
         super.onStop();
 
     }
@@ -627,7 +537,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
     @Override
     public void setupChanged(int format, int width, int height) {
         RelativeLayout.LayoutParams relativeLayout= (RelativeLayout.LayoutParams) mGLSurfaceView.getLayoutParams();
-        relativeLayout.topMargin=dh/3;
+        relativeLayout.topMargin=dh/3+50;
         relativeLayout.height=dh*2/3;
         mGLSurfaceView.setLayoutParams(relativeLayout);
         mGLSurfaceView.invalidate();
@@ -657,7 +567,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
             if (!result.isEmpty()) {
                 if (bitmapList.size()>0){
                     bitmapList.clear();
-                    adapter.notifyDataSetChanged();
+
                 }
                 for (AFT_FSDKFace fsdkFace : result){
                     YuvImage yuv = new YuvImage(data, ImageFormat.NV21, mWidth, mHeight, null);
@@ -665,7 +575,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                     yuv.compressToJpeg(fsdkFace.getRect(), 100, ops);
                     final Bitmap bmp = BitmapFactory.decodeByteArray(ops.getByteArray(), 0, ops.getByteArray().length);
                     bitmapList.add(bmp);
-                    adapter.notifyDataSetChanged();
+
                     try {
                         basket.put("An apple");
                         Log.d("hhhhhh", "插入成功");
@@ -694,7 +604,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                 isA=true;
                 if (bitmapList.size()>0){
                     bitmapList.clear();
-                    adapter.notifyDataSetChanged();
+
                 }
 
             }

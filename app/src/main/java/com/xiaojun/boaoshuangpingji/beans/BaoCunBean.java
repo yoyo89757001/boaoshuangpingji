@@ -26,7 +26,6 @@ public class BaoCunBean {
     private int boyingren;
     private String zhanghuId;
     private String wenzi;
-    private int size;
     private String touxiangzhuji;
     private String houtaiDiZhi;
     private String huiyiId;
@@ -36,14 +35,15 @@ public class BaoCunBean {
     private String shiPingWeiZhi;
     private String zhanhuiId;
     private String zhanhuiBianMa;
-    @Generated(hash = 1490855387)
+    private String screen_token;
+    @Generated(hash = 1560397265)
     public BaoCunBean(@NotNull Long id, String shipingIP, String zhujiDiZhi,
-                      int moban, String tuisongDiZhi, String gonggao,
-                      boolean isShowMoshengren, boolean isShowShiPingLiu, boolean isHengOrShu,
-                      int yusu, int yudiao, int boyingren, String zhanghuId, String wenzi,
-                      int size, String touxiangzhuji, String houtaiDiZhi, String huiyiId,
-                      String wenzi1, int size1, String guanggaojiMing, String shiPingWeiZhi,
-                      String zhanhuiId, String zhanhuiBianMa) {
+            int moban, String tuisongDiZhi, String gonggao,
+            boolean isShowMoshengren, boolean isShowShiPingLiu, boolean isHengOrShu,
+            int yusu, int yudiao, int boyingren, String zhanghuId, String wenzi,
+            String touxiangzhuji, String houtaiDiZhi, String huiyiId, String wenzi1,
+            int size1, String guanggaojiMing, String shiPingWeiZhi,
+            String zhanhuiId, String zhanhuiBianMa, String screen_token) {
         this.id = id;
         this.shipingIP = shipingIP;
         this.zhujiDiZhi = zhujiDiZhi;
@@ -58,7 +58,6 @@ public class BaoCunBean {
         this.boyingren = boyingren;
         this.zhanghuId = zhanghuId;
         this.wenzi = wenzi;
-        this.size = size;
         this.touxiangzhuji = touxiangzhuji;
         this.houtaiDiZhi = houtaiDiZhi;
         this.huiyiId = huiyiId;
@@ -68,6 +67,7 @@ public class BaoCunBean {
         this.shiPingWeiZhi = shiPingWeiZhi;
         this.zhanhuiId = zhanhuiId;
         this.zhanhuiBianMa = zhanhuiBianMa;
+        this.screen_token = screen_token;
     }
     @Generated(hash = 1469853663)
     public BaoCunBean() {
@@ -156,12 +156,6 @@ public class BaoCunBean {
     public void setWenzi(String wenzi) {
         this.wenzi = wenzi;
     }
-    public int getSize() {
-        return this.size;
-    }
-    public void setSize(int size) {
-        this.size = size;
-    }
     public String getTouxiangzhuji() {
         return this.touxiangzhuji;
     }
@@ -215,5 +209,11 @@ public class BaoCunBean {
     }
     public void setZhanhuiBianMa(String zhanhuiBianMa) {
         this.zhanhuiBianMa = zhanhuiBianMa;
+    }
+    public String getScreen_token() {
+        return this.screen_token;
+    }
+    public void setScreen_token(String screen_token) {
+        this.screen_token = screen_token;
     }
 }

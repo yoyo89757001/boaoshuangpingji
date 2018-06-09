@@ -22,6 +22,7 @@ import android.graphics.Point;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Build;
+import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
@@ -47,6 +48,24 @@ public class Utils {
      * Making sure public utility methods remain static
      */
     private Utils() {
+    }
+
+    public static String getSerialNumber(Context context){
+
+        String serial = null;
+
+        try {
+
+            serial = Settings.System.getString(context.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+        } catch (Exception e) {
+
+            e.printStackTrace();
+
+        }
+
+        return serial;
+
     }
 
     /**
