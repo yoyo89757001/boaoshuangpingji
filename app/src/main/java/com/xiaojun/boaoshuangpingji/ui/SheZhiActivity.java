@@ -31,7 +31,9 @@ import com.xiaojun.boaoshuangpingji.beans.BaoCunBean;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunBeanDao;
 import com.xiaojun.boaoshuangpingji.cookies.CookiesManager;
 import com.xiaojun.boaoshuangpingji.dialogs.XiuGaiHouTaiDialog;
+import com.xiaojun.boaoshuangpingji.dialogs.XiuGaiHouTaiDialog2;
 import com.xiaojun.boaoshuangpingji.utils.FileUtil;
+import com.xiaojun.boaoshuangpingji.utils.GsonUtil;
 import com.xiaojun.boaoshuangpingji.utils.Utils;
 
 
@@ -62,6 +64,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
+import static android.support.constraint.Constraints.TAG;
 import static com.xiaojun.boaoshuangpingji.MyApplication.TIMEOUT;
 
 
@@ -84,12 +87,13 @@ public class SheZhiActivity extends Activity implements View.OnClickListener, Vi
         dh = Utils.getDisplaySize(SheZhiActivity.this).y;
         baoCunBeanDao= MyApplication.myApplication.getDaoSession().getBaoCunBeanDao();
         baoCunBean=baoCunBeanDao.load(123456L);
-        if (baoCunBean.getWenzi()==null){
-            baoCunBean.setWenzi("");
+        if (baoCunBean==null){
+            BaoCunBean baoBean=new BaoCunBean();
+            baoBean.setId(123456L);
+            baoCunBeanDao.insert(baoBean);
+            baoCunBean=baoCunBeanDao.load(123456L);
         }
 
-        baoCunBeanDao.update(baoCunBean);
-        baoCunBean=baoCunBeanDao.load(123456L);
 
         setContentView(R.layout.activity_she_zhi);
 
@@ -418,10 +422,39 @@ public class SheZhiActivity extends Activity implements View.OnClickListener, Vi
                 animatorSet8.addListener(new AnimatorListenerAdapter(){
                     @Override
                     public void onAnimationEnd(Animator animation) {
-
-
-
                         //弹窗
+                        final XiuGaiHouTaiDialog2 dialog2=new XiuGaiHouTaiDialog2(SheZhiActivity.this);
+                        if (baoCunBean.getHoutaiDiZhi()==null && baoCunBean.getGuanggaojiMing()==null){
+                            dialog2.setContents("http://192.168.2.161","","");
+                        }else {
+                            dialog2.setContents(baoCunBean.getHoutaiDiZhi(),baoCunBean.getZhanghuId(),baoCunBean.getGuanggaojiMing());
+                        }
+                        dialog2.setOnQueRenListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                baoCunBean.setHoutaiDiZhi(dialog2.getContents());
+                                baoCunBean.setGuanggaojiMing(dialog2.getGuangGaoJiMing());
+                                baoCunBean.setZhanghuId(dialog2.getZhangHuId());
+                                baoCunBeanDao.update(baoCunBean);
+                                baoCunBean=baoCunBeanDao.load(123456L);
+                                try {
+                                    getOkHttpClient2(dialog2.getGuangGaoJiMing(),dialog2.getZhangHuId(),dialog2.getContents());
+
+                                }catch (Exception e){
+                                    Log.d("SheZhiActivity", e.getMessage());
+                                }
+
+                                dialog2.dismiss();
+
+                            }
+                        });
+                        dialog2.setQuXiaoListener(new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                dialog2.dismiss();
+                            }
+                        });
+                        dialog2.show();
 
 
                         bt8.setEnabled(true);
@@ -451,9 +484,9 @@ public class SheZhiActivity extends Activity implements View.OnClickListener, Vi
                         //弹窗
                         final XiuGaiHouTaiDialog dialog=new XiuGaiHouTaiDialog(SheZhiActivity.this);
                         if (baoCunBean.getHoutaiDiZhi()==null && baoCunBean.getGuanggaojiMing()==null){
-                            dialog.setContents("http://192.168.2.161:8080","广告机1","10000032");
+                            dialog.setContents("http://192.168.2.161","","");
                         }else {
-                            dialog.setContents(baoCunBean.getHoutaiDiZhi(),baoCunBean.getGuanggaojiMing(),baoCunBean.getZhanghuId());
+                            dialog.setContents(baoCunBean.getHoutaiDiZhi(),baoCunBean.getZhanghuId(),baoCunBean.getGuanggaojiMing());
                         }
                         dialog.setOnQueRenListener(new View.OnClickListener() {
                             @Override
@@ -464,7 +497,7 @@ public class SheZhiActivity extends Activity implements View.OnClickListener, Vi
                                 baoCunBeanDao.update(baoCunBean);
                                 baoCunBean=baoCunBeanDao.load(123456L);
                                 try {
-                                    link_login();
+                                    getOkHttpClient2(dialog.getGuangGaoJiMing(),dialog.getZhangHuId(),dialog.getContents());
 
                                 }catch (Exception e){
                                     Log.d("SheZhiActivity", e.getMessage());
@@ -885,8 +918,7 @@ public class SheZhiActivity extends Activity implements View.OnClickListener, Vi
 
 
     //首先登录-->获取所有主机-->创建或者删除或者更新门禁
-    public void getOkHttpClient(final int type){
-
+    private void getOkHttpClient2(String userName,String pwd,String url){
         okHttpClient = new OkHttpClient.Builder()
                 .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
                 .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
@@ -895,63 +927,66 @@ public class SheZhiActivity extends Activity implements View.OnClickListener, Vi
                 .retryOnConnectionFailure(true)
                 .build();
 
-//			JSONObject json = new JSONObject();
-//			try {
-//				json.put("username", "test@megvii.com");
-//				json.put("password", "123456");
-//			} catch (JSONException e) {
-//				e.printStackTrace();
-//			}
-
-
-        //创建一个RequestBody(参数1：数据类型 参数2传递的json串)
-        //	RequestBody requestBody = RequestBody.create(JSON, json.toString());
-
         RequestBody body = new FormBody.Builder()
-                .add("username", zhuJiBeanH.getUsername())
-                .add("password", zhuJiBeanH.getPwd())
+                .add("username", userName)
+                .add("password", pwd)
+                .add("pad_id", Utils.getSerialNumber(this)==null?Utils.getIMSI():Utils.getSerialNumber(SheZhiActivity.this))
+                .add("device_type", "2")
                 .build();
 
         Request.Builder requestBuilder = new Request.Builder();
         requestBuilder.header("User-Agent", "Koala Admin");
         requestBuilder.header("Content-Type","application/json");
         requestBuilder.post(body);
-        requestBuilder.url(zhuJiBeanH.getHostUrl()+"/auth/login");
+        requestBuilder.url(url+"/pad/login");
         final Request request = requestBuilder.build();
-        Log.d("SheZhiActivity", zhuJiBeanH.getUsername());
-        Log.d("SheZhiActivity", zhuJiBeanH.getPwd());
+
         Call mcall= okHttpClient.newCall(request);
         mcall.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-
-                Log.d("ffffff", "登陆失败"+e.getMessage());
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        TastyToast.makeText(SheZhiActivity.this,"登陆失败",TastyToast.LENGTH_LONG,TastyToast.ERROR).show();
+                    }
+                });
             }
-
             @Override
             public void onResponse(Call call, Response response) throws IOException {
+                try {
+
                 String s=response.body().string();
-                Log.d("ffffff", "登陆"+s);
+                Log.d(TAG, "登录"+s);
                 JsonObject jsonObject= GsonUtil.parse(s).getAsJsonObject();
-                int i=1;
-                i=jsonObject.get("code").getAsInt();
-                if (i==0){
+                int n=1;
+                n=jsonObject.get("code").getAsInt();
+                if (n==0){
                     //登录成功,后续的连接操作因为cookies 原因,要用 MyApplication.okHttpClient
-                    MyApplication.okHttpClient=okHttpClient;
-                    if (type==1){
-                        link_huiqumenjin();
-                    }else {
-
-                        link_getKu();
-                    }
-
-
-
+                    JsonObject jo=jsonObject.get("data").getAsJsonObject();
+                    baoCunBean.setScreen_token(jo.get("screen_token").getAsString());
+                    baoCunBeanDao.update(baoCunBean);
+                    Log.d("DetecterActivity", baoCunBean.getScreen_token()+"Screen_token");
                 }
-
+                else {
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            TastyToast.makeText(SheZhiActivity.this,"获取Screen_token失败",TastyToast.LENGTH_LONG,TastyToast.ERROR).show();
+                        }
+                    });
+                }
+                }catch (final Exception e){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            TastyToast.makeText(SheZhiActivity.this,"登陆失败"+e.getMessage(),TastyToast.LENGTH_LONG,TastyToast.ERROR).show();
+                        }
+                    });
+                }
             }
-        });
 
+        });
 
     }
 

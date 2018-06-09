@@ -2,6 +2,7 @@ package com.xiaojun.boaoshuangpingji.ui;
 
 import android.app.Activity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 
 import android.os.Bundle;
@@ -11,6 +12,8 @@ import android.os.Message;
 import android.os.SystemClock;
 
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
@@ -55,7 +58,7 @@ import okhttp3.ResponseBody;
 
 public class DetecterActivity extends Activity {
 	private final String TAG = this.getClass().getSimpleName();
-
+	private TextView shezhi;
 	private int mWidth, mHeight, mFormat;
 	private OkHttpClient okHttpClient=null;
 
@@ -127,7 +130,13 @@ public class DetecterActivity extends Activity {
 		super.onCreate(savedInstanceState);
 
 		setContentView(R.layout.activity_camera);
-
+		shezhi=findViewById(R.id.shezhi);
+		shezhi.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				startActivity(new Intent(DetecterActivity.this,SheZhiActivity.class));
+			}
+		});
 
 
 		CustomerEngine.getInstance(getApplicationContext(),DetecterActivity.this);

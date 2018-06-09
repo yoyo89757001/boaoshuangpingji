@@ -351,7 +351,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getOkHttpClient2();
+
         mCameraID =  Camera.CameraInfo.CAMERA_FACING_BACK ;
         mCameraRotate =  90 ;
         mCameraMirror =  false;
@@ -537,7 +537,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
     @Override
     public void setupChanged(int format, int width, int height) {
         RelativeLayout.LayoutParams relativeLayout= (RelativeLayout.LayoutParams) mGLSurfaceView.getLayoutParams();
-        relativeLayout.topMargin=dh/3+50;
+        relativeLayout.topMargin=dh/3+40;
         relativeLayout.height=dh*2/3;
         mGLSurfaceView.setLayoutParams(relativeLayout);
         mGLSurfaceView.invalidate();
@@ -567,7 +567,6 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
             if (!result.isEmpty()) {
                 if (bitmapList.size()>0){
                     bitmapList.clear();
-
                 }
                 for (AFT_FSDKFace fsdkFace : result){
                     YuvImage yuv = new YuvImage(data, ImageFormat.NV21, mWidth, mHeight, null);
@@ -650,56 +649,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
     }
 
 
-    //首先登录-->获取所有主机-->创建或者删除或者更新门禁
-    private void getOkHttpClient2(){
-        okHttpClient = new OkHttpClient.Builder()
-                .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-                .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-                .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
-                .cookieJar(new CookiesManager())
-                .retryOnConnectionFailure(true)
-                .build();
 
-        RequestBody body = new FormBody.Builder()
-                .add("username", "test@megvii.com")
-                .add("password", "123456")
-                .add("pad_id", Utils.getIMSI())
-                .add("device_type", "2")
-                .build();
-
-        Request.Builder requestBuilder = new Request.Builder();
-        requestBuilder.header("User-Agent", "Koala Admin");
-        requestBuilder.header("Content-Type","application/json");
-        requestBuilder.post(body);
-        requestBuilder.url("http://192.168.2.64"+"/pad/login");
-        final Request request = requestBuilder.build();
-
-        Call mcall= okHttpClient.newCall(request);
-        mcall.enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d(TAG, "登陆失败"+e.getMessage());
-            }
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String s=response.body().string();
-                Log.d(TAG, "登录"+s);
-                JsonObject jsonObject= GsonUtil.parse(s).getAsJsonObject();
-                int n=1;
-                n=jsonObject.get("code").getAsInt();
-                if (n==0){
-                    //登录成功,后续的连接操作因为cookies 原因,要用 MyApplication.okHttpClient
-                    JsonObject jo=jsonObject.get("data").getAsJsonObject();
-                    screen_token=jo.get("screen_token").getAsString();
-                    Log.d("DetecterActivity", screen_token);
-                }
-                else {
-
-                }
-            }
-        });
-
-    }
 
 
     public static final int TIMEOUT2 = 1000 * 5;
