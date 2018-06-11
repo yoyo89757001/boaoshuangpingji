@@ -733,7 +733,8 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                     String s2=ss.replace("\\\\u","@!@#u").replace("\\","")
                             .replace("tag\": \"{","tag\":{")
                             .replace("jpg\"}\"","jpg\"}")
-                            .replace("@!@#","\\");
+                            .replace("@!@#","\\")
+                            .replace("0}\"","0}");
 
 
                     Log.d("AllConnects", "传照片2" + s2);
