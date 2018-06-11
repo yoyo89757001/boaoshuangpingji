@@ -13,7 +13,7 @@
 
         <TextView
             android:id="@+id/title2"
-            android:text="设置(旷视)主机URL(必填)"
+            android:text="设置主机URL(必填)"
             android:textSize="18sp"
             android:gravity="center"
             android:textColor="#000000"
@@ -47,7 +47,7 @@
         android:layout_height="wrap_content">
 
         <TextView
-            android:text="设置主机账号(必填)"
+            android:text="设置展会id(必填)"
             android:textSize="18sp"
             android:gravity="center"
             android:textColor="#000000"
@@ -75,47 +75,13 @@
 
     </LinearLayout>
 
-    <LinearLayout
-        android:gravity="center_horizontal"
-        android:orientation="vertical"
-        android:layout_width="280dp"
-        android:layout_height="200dp">
-
-        <TextView
-            android:text="设置主机密码(必填)"
-            android:textSize="18sp"
-            android:layout_weight="0.6"
-            android:gravity="center"
-            android:textColor="#000000"
-            android:layout_width="wrap_content"
-            android:layout_height="0dp" />
-
-        <View
-            android:background="@color/colorBar_bg"
-            android:layout_width="match_parent"
-            android:layout_height="0.8dp"/>
-
-
-        <EditText
-            android:textColor="@color/textcolor"
-            android:textSize="14sp"
-            android:background="@null"
-            android:gravity="center"
-            android:inputType="textPassword"
-            android:id="@+id/xiangce2"
-            android:layout_width="match_parent"
-            android:layout_height="60dp" />
-        <View
-            android:background="@color/colorBar_bg"
-            android:layout_width="match_parent"
-            android:layout_height="0.8dp"/>
 
         <LinearLayout
             android:orientation="horizontal"
-            android:layout_weight="0.5"
             android:gravity="center"
-            android:layout_width="match_parent"
-            android:layout_height="0dp">
+            android:layout_marginTop="10dp"
+            android:layout_width="280dp"
+            android:layout_height="60dp">
 
             <Button
                 android:layout_width="0dp"
@@ -143,6 +109,6 @@
 
         </LinearLayout>
 
-    </LinearLayout>
+
 
 </LinearLayout>

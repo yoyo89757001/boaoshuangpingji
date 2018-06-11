@@ -118,10 +118,6 @@ public class DetecterActivity extends Activity {
 	});
 
 
-
-
-
-
 	/* (non-Javadoc)
 	 * @see android.app.Activity#onCreate(android.os.Bundle)
 	 */

@@ -41,11 +41,13 @@ public class BaoCunBeanDao extends AbstractDao<BaoCunBean, Long> {
         public final static Property HuiyiId = new Property(16, String.class, "huiyiId", false, "HUIYI_ID");
         public final static Property Wenzi1 = new Property(17, String.class, "wenzi1", false, "WENZI1");
         public final static Property Size1 = new Property(18, int.class, "size1", false, "SIZE1");
-        public final static Property GuanggaojiMing = new Property(19, String.class, "guanggaojiMing", false, "GUANGGAOJI_MING");
-        public final static Property ShiPingWeiZhi = new Property(20, String.class, "shiPingWeiZhi", false, "SHI_PING_WEI_ZHI");
-        public final static Property ZhanhuiId = new Property(21, String.class, "zhanhuiId", false, "ZHANHUI_ID");
-        public final static Property ZhanhuiBianMa = new Property(22, String.class, "zhanhuiBianMa", false, "ZHANHUI_BIAN_MA");
-        public final static Property Screen_token = new Property(23, String.class, "screen_token", false, "SCREEN_TOKEN");
+        public final static Property Zhanghao_ks = new Property(19, String.class, "zhanghao_ks", false, "ZHANGHAO_KS");
+        public final static Property Mima_ks = new Property(20, String.class, "mima_ks", false, "MIMA_KS");
+        public final static Property Houtaidizhi_ks = new Property(21, String.class, "houtaidizhi_ks", false, "HOUTAIDIZHI_KS");
+        public final static Property ShiPingWeiZhi = new Property(22, String.class, "shiPingWeiZhi", false, "SHI_PING_WEI_ZHI");
+        public final static Property ZhanhuiId = new Property(23, String.class, "zhanhuiId", false, "ZHANHUI_ID");
+        public final static Property ZhanhuiBianMa = new Property(24, String.class, "zhanhuiBianMa", false, "ZHANHUI_BIAN_MA");
+        public final static Property Screen_token = new Property(25, String.class, "screen_token", false, "SCREEN_TOKEN");
     }
 
 
@@ -80,11 +82,13 @@ public class BaoCunBeanDao extends AbstractDao<BaoCunBean, Long> {
                 "\"HUIYI_ID\" TEXT," + // 16: huiyiId
                 "\"WENZI1\" TEXT," + // 17: wenzi1
                 "\"SIZE1\" INTEGER NOT NULL ," + // 18: size1
-                "\"GUANGGAOJI_MING\" TEXT," + // 19: guanggaojiMing
-                "\"SHI_PING_WEI_ZHI\" TEXT," + // 20: shiPingWeiZhi
-                "\"ZHANHUI_ID\" TEXT," + // 21: zhanhuiId
-                "\"ZHANHUI_BIAN_MA\" TEXT," + // 22: zhanhuiBianMa
-                "\"SCREEN_TOKEN\" TEXT);"); // 23: screen_token
+                "\"ZHANGHAO_KS\" TEXT," + // 19: zhanghao_ks
+                "\"MIMA_KS\" TEXT," + // 20: mima_ks
+                "\"HOUTAIDIZHI_KS\" TEXT," + // 21: houtaidizhi_ks
+                "\"SHI_PING_WEI_ZHI\" TEXT," + // 22: shiPingWeiZhi
+                "\"ZHANHUI_ID\" TEXT," + // 23: zhanhuiId
+                "\"ZHANHUI_BIAN_MA\" TEXT," + // 24: zhanhuiBianMa
+                "\"SCREEN_TOKEN\" TEXT);"); // 25: screen_token
     }
 
     /** Drops the underlying database table. */
@@ -156,29 +160,39 @@ public class BaoCunBeanDao extends AbstractDao<BaoCunBean, Long> {
         }
         stmt.bindLong(19, entity.getSize1());
  
-        String guanggaojiMing = entity.getGuanggaojiMing();
-        if (guanggaojiMing != null) {
-            stmt.bindString(20, guanggaojiMing);
+        String zhanghao_ks = entity.getZhanghao_ks();
+        if (zhanghao_ks != null) {
+            stmt.bindString(20, zhanghao_ks);
+        }
+ 
+        String mima_ks = entity.getMima_ks();
+        if (mima_ks != null) {
+            stmt.bindString(21, mima_ks);
+        }
+ 
+        String houtaidizhi_ks = entity.getHoutaidizhi_ks();
+        if (houtaidizhi_ks != null) {
+            stmt.bindString(22, houtaidizhi_ks);
         }
  
         String shiPingWeiZhi = entity.getShiPingWeiZhi();
         if (shiPingWeiZhi != null) {
-            stmt.bindString(21, shiPingWeiZhi);
+            stmt.bindString(23, shiPingWeiZhi);
         }
  
         String zhanhuiId = entity.getZhanhuiId();
         if (zhanhuiId != null) {
-            stmt.bindString(22, zhanhuiId);
+            stmt.bindString(24, zhanhuiId);
         }
  
         String zhanhuiBianMa = entity.getZhanhuiBianMa();
         if (zhanhuiBianMa != null) {
-            stmt.bindString(23, zhanhuiBianMa);
+            stmt.bindString(25, zhanhuiBianMa);
         }
  
         String screen_token = entity.getScreen_token();
         if (screen_token != null) {
-            stmt.bindString(24, screen_token);
+            stmt.bindString(26, screen_token);
         }
     }
 
@@ -245,29 +259,39 @@ public class BaoCunBeanDao extends AbstractDao<BaoCunBean, Long> {
         }
         stmt.bindLong(19, entity.getSize1());
  
-        String guanggaojiMing = entity.getGuanggaojiMing();
-        if (guanggaojiMing != null) {
-            stmt.bindString(20, guanggaojiMing);
+        String zhanghao_ks = entity.getZhanghao_ks();
+        if (zhanghao_ks != null) {
+            stmt.bindString(20, zhanghao_ks);
+        }
+ 
+        String mima_ks = entity.getMima_ks();
+        if (mima_ks != null) {
+            stmt.bindString(21, mima_ks);
+        }
+ 
+        String houtaidizhi_ks = entity.getHoutaidizhi_ks();
+        if (houtaidizhi_ks != null) {
+            stmt.bindString(22, houtaidizhi_ks);
         }
  
         String shiPingWeiZhi = entity.getShiPingWeiZhi();
         if (shiPingWeiZhi != null) {
-            stmt.bindString(21, shiPingWeiZhi);
+            stmt.bindString(23, shiPingWeiZhi);
         }
  
         String zhanhuiId = entity.getZhanhuiId();
         if (zhanhuiId != null) {
-            stmt.bindString(22, zhanhuiId);
+            stmt.bindString(24, zhanhuiId);
         }
  
         String zhanhuiBianMa = entity.getZhanhuiBianMa();
         if (zhanhuiBianMa != null) {
-            stmt.bindString(23, zhanhuiBianMa);
+            stmt.bindString(25, zhanhuiBianMa);
         }
  
         String screen_token = entity.getScreen_token();
         if (screen_token != null) {
-            stmt.bindString(24, screen_token);
+            stmt.bindString(26, screen_token);
         }
     }
 
@@ -298,11 +322,13 @@ public class BaoCunBeanDao extends AbstractDao<BaoCunBean, Long> {
             cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16), // huiyiId
             cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17), // wenzi1
             cursor.getInt(offset + 18), // size1
-            cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19), // guanggaojiMing
-            cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20), // shiPingWeiZhi
-            cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21), // zhanhuiId
-            cursor.isNull(offset + 22) ? null : cursor.getString(offset + 22), // zhanhuiBianMa
-            cursor.isNull(offset + 23) ? null : cursor.getString(offset + 23) // screen_token
+            cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19), // zhanghao_ks
+            cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20), // mima_ks
+            cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21), // houtaidizhi_ks
+            cursor.isNull(offset + 22) ? null : cursor.getString(offset + 22), // shiPingWeiZhi
+            cursor.isNull(offset + 23) ? null : cursor.getString(offset + 23), // zhanhuiId
+            cursor.isNull(offset + 24) ? null : cursor.getString(offset + 24), // zhanhuiBianMa
+            cursor.isNull(offset + 25) ? null : cursor.getString(offset + 25) // screen_token
         );
         return entity;
     }
@@ -328,11 +354,13 @@ public class BaoCunBeanDao extends AbstractDao<BaoCunBean, Long> {
         entity.setHuiyiId(cursor.isNull(offset + 16) ? null : cursor.getString(offset + 16));
         entity.setWenzi1(cursor.isNull(offset + 17) ? null : cursor.getString(offset + 17));
         entity.setSize1(cursor.getInt(offset + 18));
-        entity.setGuanggaojiMing(cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19));
-        entity.setShiPingWeiZhi(cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20));
-        entity.setZhanhuiId(cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21));
-        entity.setZhanhuiBianMa(cursor.isNull(offset + 22) ? null : cursor.getString(offset + 22));
-        entity.setScreen_token(cursor.isNull(offset + 23) ? null : cursor.getString(offset + 23));
+        entity.setZhanghao_ks(cursor.isNull(offset + 19) ? null : cursor.getString(offset + 19));
+        entity.setMima_ks(cursor.isNull(offset + 20) ? null : cursor.getString(offset + 20));
+        entity.setHoutaidizhi_ks(cursor.isNull(offset + 21) ? null : cursor.getString(offset + 21));
+        entity.setShiPingWeiZhi(cursor.isNull(offset + 22) ? null : cursor.getString(offset + 22));
+        entity.setZhanhuiId(cursor.isNull(offset + 23) ? null : cursor.getString(offset + 23));
+        entity.setZhanhuiBianMa(cursor.isNull(offset + 24) ? null : cursor.getString(offset + 24));
+        entity.setScreen_token(cursor.isNull(offset + 25) ? null : cursor.getString(offset + 25));
      }
     
     @Override

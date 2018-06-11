@@ -15,7 +15,7 @@ import android.os.Environment;
 import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
-import android.support.v7.widget.RecyclerView;
+
 import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
@@ -59,7 +59,9 @@ import com.guo.android_extend.widget.CameraGLSurfaceView;
 import com.guo.android_extend.widget.CameraSurfaceView;
 import com.xiaojun.boaoshuangpingji.MyApplication;
 import com.xiaojun.boaoshuangpingji.R;
-import com.xiaojun.boaoshuangpingji.adapters.ImagesAdapter;
+
+import com.xiaojun.boaoshuangpingji.beans.BaoCunBean;
+import com.xiaojun.boaoshuangpingji.beans.BaoCunBeanDao;
 import com.xiaojun.boaoshuangpingji.beans.MenBean;
 import com.xiaojun.boaoshuangpingji.cookies.CookiesManager;
 import com.xiaojun.boaoshuangpingji.interfaces.RecytviewCash;
@@ -142,7 +144,8 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
     private  String screen_token=null;
     private LinearLayout linearLayout;
     private ScrollView scrollView;
-
+    private BaoCunBeanDao baoCunBeanDao=MyApplication.myApplication.getDaoSession().getBaoCunBeanDao();
+    private BaoCunBean baoCunBean=null;
 
     public  Handler handler=new Handler(new Handler.Callback() {
 
@@ -338,7 +341,6 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
         }
     }
 
-    private RecyclerView recyclerView;
 
 
     public CustomerDisplay(Context outerContext, Display display,Activity activity) {
@@ -351,7 +353,10 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-
+        baoCunBean= baoCunBeanDao.load(123456L);
+        if (baoCunBean!=null){
+            screen_token= baoCunBean.getScreen_token();
+        }
         mCameraID =  Camera.CameraInfo.CAMERA_FACING_BACK ;
         mCameraRotate =  90 ;
         mCameraMirror =  false;
@@ -468,6 +473,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                 }
             }
 
+
             //parameters.setPreviewFpsRange(15000, 30000);
             //parameters.setExposureCompensation(parameters.getMaxExposureCompensation());
             //parameters.setWhiteBalance(Camera.Parameters.WHITE_BALANCE_AUTO);
@@ -537,7 +543,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
     @Override
     public void setupChanged(int format, int width, int height) {
         RelativeLayout.LayoutParams relativeLayout= (RelativeLayout.LayoutParams) mGLSurfaceView.getLayoutParams();
-        relativeLayout.topMargin=dh/3+40;
+        relativeLayout.topMargin=dh/3+50;
         relativeLayout.height=dh*2/3;
         mGLSurfaceView.setLayoutParams(relativeLayout);
         mGLSurfaceView.invalidate();
@@ -559,6 +565,8 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
 //		for (AFT_FSDKFace face : result) {
 //			Log.d(TAG, "Face:" + face.toString());
 //		}
+
+
         AFT_FSDKError err = engine.AFT_FSDK_FaceFeatureDetect(data, width, height, AFT_FSDKEngine.CP_PAF_NV21, result);
 
         if (isA) {
@@ -568,6 +576,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                 if (bitmapList.size()>0){
                     bitmapList.clear();
                 }
+                try {
                 for (AFT_FSDKFace fsdkFace : result){
                     YuvImage yuv = new YuvImage(data, ImageFormat.NV21, mWidth, mHeight, null);
                     ExtByteArrayOutputStream ops = new ExtByteArrayOutputStream();
@@ -576,27 +585,49 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                     bitmapList.add(bmp);
 
                     try {
-                        basket.put("An apple");
-                        Log.d("hhhhhh", "插入成功");
-                    } catch (InterruptedException e) {
-                        Log.d("hhhhhh", e.getMessage()+"插入异常");
-                        basket.clear();
-                        isA=true;
-                    }
-                    new Thread(new Runnable() {
-                        @Override
-                        public void run() {
-                            link_P2(compressImage(bmp),size);
-                        }
-                    }).start();
 
-                    try {
                         ops.close();
                     } catch (IOException e) {
                         e.printStackTrace();
+                        isA=true;
+                         break;
                     }
+                       }
+                    }
+                    catch (Exception e) {
+                    isA=true;
                 }
+                if (baoCunBean!=null && baoCunBean.getHoutaidizhi_ks()!=null  ){
+                if (bitmapList.size()>0){
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                for (Bitmap bitmap:bitmapList){
+                                    synchronized (bitmap){
 
+                                        link_P2(compressImage(bitmap),bitmap);
+                                        try {
+                                            bitmap.wait();
+                                        } catch (InterruptedException e) {
+                                            e.printStackTrace();
+                                            isA=true;
+                                        }
+
+                                    }
+
+                                }
+                                //循环完
+                                isA=true;
+
+                            }
+                        }).start();
+
+                    }else {
+                        isA=true;
+                    }
+                }else {
+                    isA=true;
+                }
 
             }else {
 
@@ -607,8 +638,6 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                 }
 
             }
-
-
 
         }
 
@@ -654,7 +683,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
 
     public static final int TIMEOUT2 = 1000 * 5;
     // 1:N 对比
-    private void link_P2(final File file, final int size) {
+    private void link_P2(final File file, final Bitmap bitmap) {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .writeTimeout(TIMEOUT2, TimeUnit.MILLISECONDS)
                 .connectTimeout(TIMEOUT2, TimeUnit.MILLISECONDS)
@@ -675,7 +704,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
         Request.Builder requestBuilder = new Request.Builder()
                 .header("Content-Type", "application/json")
                 .post(mBody)
-                .url("http://192.168.2.64"+ ":8866/recognize");
+                .url(baoCunBean.getHoutaidizhi_ks()+ ":8866/recognize");
 
         // step 3：创建 Call 对象
         Call call = okHttpClient.newCall(requestBuilder.build());
@@ -685,16 +714,11 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.d("AllConnects", "请求识别失败" + e.getMessage());
-                SystemClock.sleep(300);
-                try {
-                    basket.take();
-                    if (basket.size()==0)
-                        isA=true;
-                } catch (InterruptedException e1) {
-                    basket.clear();
-                    isA=true;
-                    e1.printStackTrace();
+                synchronized (bitmap){
+
+                    bitmap.notify();
                 }
+
             }
 
             @Override
@@ -730,15 +754,9 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                 } catch (Exception e) {
                     Log.d("WebsocketPushMsg", e.getMessage()+"");
                 }finally {
-                    SystemClock.sleep(300);
-                    try {
-                        basket.take();
-                        if (basket.size()==0)
-                            isA=true;
-                    } catch (InterruptedException e1) {
-                        basket.clear();
-                        isA=true;
-                        e1.printStackTrace();
+
+                    synchronized (bitmap){
+                        bitmap.notify();
                     }
                 }
 

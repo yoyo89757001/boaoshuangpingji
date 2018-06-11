@@ -64,7 +64,7 @@ import okhttp3.RequestBody;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 
-import static android.support.constraint.Constraints.TAG;
+
 import static com.xiaojun.boaoshuangpingji.MyApplication.TIMEOUT;
 
 
@@ -424,21 +424,22 @@ public class SheZhiActivity extends Activity implements View.OnClickListener, Vi
                     public void onAnimationEnd(Animator animation) {
                         //弹窗
                         final XiuGaiHouTaiDialog2 dialog2=new XiuGaiHouTaiDialog2(SheZhiActivity.this);
-                        if (baoCunBean.getHoutaiDiZhi()==null && baoCunBean.getGuanggaojiMing()==null){
-                            dialog2.setContents("http://192.168.2.161","","");
+                        if (baoCunBean.getHoutaiDiZhi()==null ){
+                            dialog2.setContents("http://192.168.2.161:8080","");
                         }else {
-                            dialog2.setContents(baoCunBean.getHoutaiDiZhi(),baoCunBean.getZhanghuId(),baoCunBean.getGuanggaojiMing());
+                            dialog2.setContents(baoCunBean.getHoutaiDiZhi(),baoCunBean.getZhanhuiId());
                         }
                         dialog2.setOnQueRenListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
                                 baoCunBean.setHoutaiDiZhi(dialog2.getContents());
-                                baoCunBean.setGuanggaojiMing(dialog2.getGuangGaoJiMing());
-                                baoCunBean.setZhanghuId(dialog2.getZhangHuId());
+                              //  baoCunBean.setGuanggaojiMing(dialog2.getGuangGaoJiMing());
+                                baoCunBean.setZhanhuiId(dialog2.getZhangHuId());
                                 baoCunBeanDao.update(baoCunBean);
                                 baoCunBean=baoCunBeanDao.load(123456L);
                                 try {
-                                    getOkHttpClient2(dialog2.getGuangGaoJiMing(),dialog2.getZhangHuId(),dialog2.getContents());
+
+//                                    getOkHttpClient2(dialog2.getGuangGaoJiMing(),dialog2.getZhangHuId(),dialog2.getContents());
 
                                 }catch (Exception e){
                                     Log.d("SheZhiActivity", e.getMessage());
@@ -483,21 +484,21 @@ public class SheZhiActivity extends Activity implements View.OnClickListener, Vi
                     public void onAnimationEnd(Animator animation) {
                         //弹窗
                         final XiuGaiHouTaiDialog dialog=new XiuGaiHouTaiDialog(SheZhiActivity.this);
-                        if (baoCunBean.getHoutaiDiZhi()==null && baoCunBean.getGuanggaojiMing()==null){
+                        if (baoCunBean.getHoutaidizhi_ks()==null || baoCunBean.getZhanghao_ks()==null){
                             dialog.setContents("http://192.168.2.161","","");
                         }else {
-                            dialog.setContents(baoCunBean.getHoutaiDiZhi(),baoCunBean.getZhanghuId(),baoCunBean.getGuanggaojiMing());
+                            dialog.setContents(baoCunBean.getHoutaidizhi_ks(),baoCunBean.getMima_ks(),baoCunBean.getZhanghao_ks());
                         }
                         dialog.setOnQueRenListener(new View.OnClickListener() {
                             @Override
                             public void onClick(View v) {
-                                baoCunBean.setHoutaiDiZhi(dialog.getContents());
-                                baoCunBean.setGuanggaojiMing(dialog.getGuangGaoJiMing());
-                                baoCunBean.setZhanghuId(dialog.getZhangHuId());
+                                baoCunBean.setHoutaidizhi_ks(dialog.getContents());
+                                baoCunBean.setMima_ks(dialog.getGuangGaoJiMing());
+                                baoCunBean.setZhanghao_ks(dialog.getZhangHuId());
                                 baoCunBeanDao.update(baoCunBean);
                                 baoCunBean=baoCunBeanDao.load(123456L);
                                 try {
-                                    getOkHttpClient2(dialog.getGuangGaoJiMing(),dialog.getZhangHuId(),dialog.getContents());
+                                    getOkHttpClient2(dialog.getZhangHuId(),dialog.getGuangGaoJiMing(),dialog.getContents());
 
                                 }catch (Exception e){
                                     Log.d("SheZhiActivity", e.getMessage());
@@ -957,7 +958,7 @@ public class SheZhiActivity extends Activity implements View.OnClickListener, Vi
                 try {
 
                 String s=response.body().string();
-                Log.d(TAG, "登录"+s);
+                Log.d("shezhiactivity", "登录"+s);
                 JsonObject jsonObject= GsonUtil.parse(s).getAsJsonObject();
                 int n=1;
                 n=jsonObject.get("code").getAsInt();
@@ -966,7 +967,12 @@ public class SheZhiActivity extends Activity implements View.OnClickListener, Vi
                     JsonObject jo=jsonObject.get("data").getAsJsonObject();
                     baoCunBean.setScreen_token(jo.get("screen_token").getAsString());
                     baoCunBeanDao.update(baoCunBean);
-                    Log.d("DetecterActivity", baoCunBean.getScreen_token()+"Screen_token");
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            TastyToast.makeText(SheZhiActivity.this,"获取Screen_token成功",TastyToast.LENGTH_LONG,TastyToast.ERROR).show();
+                        }
+                    });
                 }
                 else {
                     runOnUiThread(new Runnable() {

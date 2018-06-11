@@ -31,19 +31,22 @@ public class BaoCunBean {
     private String huiyiId;
     private String wenzi1;
     private int size1;
-    private String guanggaojiMing;
+    private String zhanghao_ks;
+    private String mima_ks;
+    private String houtaidizhi_ks;
     private String shiPingWeiZhi;
     private String zhanhuiId;
     private String zhanhuiBianMa;
     private String screen_token;
-    @Generated(hash = 1560397265)
+    @Generated(hash = 11669293)
     public BaoCunBean(@NotNull Long id, String shipingIP, String zhujiDiZhi,
             int moban, String tuisongDiZhi, String gonggao,
             boolean isShowMoshengren, boolean isShowShiPingLiu, boolean isHengOrShu,
             int yusu, int yudiao, int boyingren, String zhanghuId, String wenzi,
             String touxiangzhuji, String houtaiDiZhi, String huiyiId, String wenzi1,
-            int size1, String guanggaojiMing, String shiPingWeiZhi,
-            String zhanhuiId, String zhanhuiBianMa, String screen_token) {
+            int size1, String zhanghao_ks, String mima_ks, String houtaidizhi_ks,
+            String shiPingWeiZhi, String zhanhuiId, String zhanhuiBianMa,
+            String screen_token) {
         this.id = id;
         this.shipingIP = shipingIP;
         this.zhujiDiZhi = zhujiDiZhi;
@@ -63,7 +66,9 @@ public class BaoCunBean {
         this.huiyiId = huiyiId;
         this.wenzi1 = wenzi1;
         this.size1 = size1;
-        this.guanggaojiMing = guanggaojiMing;
+        this.zhanghao_ks = zhanghao_ks;
+        this.mima_ks = mima_ks;
+        this.houtaidizhi_ks = houtaidizhi_ks;
         this.shiPingWeiZhi = shiPingWeiZhi;
         this.zhanhuiId = zhanhuiId;
         this.zhanhuiBianMa = zhanhuiBianMa;
@@ -186,11 +191,23 @@ public class BaoCunBean {
     public void setSize1(int size1) {
         this.size1 = size1;
     }
-    public String getGuanggaojiMing() {
-        return this.guanggaojiMing;
+    public String getZhanghao_ks() {
+        return this.zhanghao_ks;
     }
-    public void setGuanggaojiMing(String guanggaojiMing) {
-        this.guanggaojiMing = guanggaojiMing;
+    public void setZhanghao_ks(String zhanghao_ks) {
+        this.zhanghao_ks = zhanghao_ks;
+    }
+    public String getMima_ks() {
+        return this.mima_ks;
+    }
+    public void setMima_ks(String mima_ks) {
+        this.mima_ks = mima_ks;
+    }
+    public String getHoutaidizhi_ks() {
+        return this.houtaidizhi_ks;
+    }
+    public void setHoutaidizhi_ks(String houtaidizhi_ks) {
+        this.houtaidizhi_ks = houtaidizhi_ks;
     }
     public String getShiPingWeiZhi() {
         return this.shiPingWeiZhi;
@@ -216,4 +233,5 @@ public class BaoCunBean {
     public void setScreen_token(String screen_token) {
         this.screen_token = screen_token;
     }
+
 }
