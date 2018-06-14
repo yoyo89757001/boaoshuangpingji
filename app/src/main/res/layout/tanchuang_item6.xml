@@ -20,26 +20,18 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent">
 
-            <TextView
-                android:textSize="70sp"
-                android:id="@+id/zuowei2"
-                android:gravity="center"
-                android:layout_weight="0.4"
-                android:textColor="@color/write"
-                android:layout_width="wrap_content"
-                android:layout_height="0dp" />
 
             <TextView
-                android:textSize="70sp"
+                android:textSize="60sp"
                 android:id="@+id/name33"
                 android:gravity="center"
-                android:layout_weight="1"
+                android:layout_weight="0.7"
                 android:textColor="@color/write"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp" />
 
             <TextView
-                android:textSize="70sp"
+                android:textSize="60sp"
                 android:id="@+id/zhuangtai33"
                 android:gravity="center"
                 android:layout_weight="1"
@@ -48,10 +40,10 @@
                 android:layout_height="0dp" />
 
             <TextView
-                android:textSize="70sp"
+                android:textSize="60sp"
                 android:id="@+id/zuowei"
                 android:gravity="center"
-                android:layout_weight="0.4"
+                android:layout_weight="1"
                 android:textColor="@color/write"
                 android:layout_width="wrap_content"
                 android:layout_height="0dp" />

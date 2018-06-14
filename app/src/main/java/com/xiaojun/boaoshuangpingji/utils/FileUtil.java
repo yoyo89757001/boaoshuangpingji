@@ -2,10 +2,12 @@ package com.xiaojun.boaoshuangpingji.utils;
 
 import android.graphics.Bitmap;
 import android.os.Environment;
+import android.util.Log;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
+import java.util.List;
 
 /**
  * Created by chenjun on 2017/5/17.
@@ -100,4 +102,47 @@ public class FileUtil {
             }
         }
     }
+
+    /**
+     * 获取指定目录内所有文件路径
+     * @param dirPath 需要查询的文件目录
+     * @param
+     */
+    public static List<String> getAllFileXml(String dirPath, List<String> fileList) {
+        File f = new File(dirPath);
+        Log.d("FileUtilXML", "f.exists():" + f.exists()+dirPath);
+        if (!f.exists()) {//判断路径是否存在
+            return null;
+        }
+
+        File[] files = f.listFiles();
+        // Log.d("FileUtil", "files.length:" + files.length);
+        if(files==null){//判断权限
+            return null;
+        }
+
+        Log.d("FileUtilXml", "文件夹个数" + files.length);
+
+        for (File _file : files) {//遍历目录
+            if(_file.isFile() && (_file.getName().endsWith("png") )){
+                String _name=_file.getName();
+                String filePath = _file.getAbsolutePath();//获取文件路径
+                //  String fileName = _file.getName().substring(0,_name.length()-4);//获取文件名
+                //  Log.d("LOGCAT","fileName:"+fileName);
+                // Log.d("LOGCAT","filePath:"+filePath);
+                try {
+                    fileList.add(filePath);
+
+                }catch (Exception e){
+                    Log.d("FileUtil", e.getMessage()+"获取usb文件异常");
+                }
+            }
+//            else if(_file.isDirectory()){//查询子目录
+//                getAllFileXml(_file.getAbsolutePath(),fileList);
+//            }
+        }
+        Log.d("FileUtil", "返回的xml个数:" + fileList.size());
+        return fileList;
+    }
+
 }

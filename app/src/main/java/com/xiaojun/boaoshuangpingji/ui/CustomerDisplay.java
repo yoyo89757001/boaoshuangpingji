@@ -66,6 +66,7 @@ import com.xiaojun.boaoshuangpingji.beans.MenBean;
 import com.xiaojun.boaoshuangpingji.cookies.CookiesManager;
 import com.xiaojun.boaoshuangpingji.interfaces.RecytviewCash;
 import com.xiaojun.boaoshuangpingji.utils.FaceDB;
+import com.xiaojun.boaoshuangpingji.utils.FileUtil;
 import com.xiaojun.boaoshuangpingji.utils.GlideCircleTransform;
 import com.xiaojun.boaoshuangpingji.utils.GsonUtil;
 import com.xiaojun.boaoshuangpingji.utils.Utils;
@@ -409,6 +410,16 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
         mFRAbsLoop = new FRAbsLoop();
         mFRAbsLoop.start();
 
+
+//        List<String> xmls=new ArrayList<>();
+//        final List<String> xmlList= FileUtil.getAllFileXml(Environment.getExternalStorageDirectory().getAbsolutePath(),xmls);
+//        if (xmlList.size()>0){
+//            for (String s:xmlList){
+//                File f=new File(s);
+//                Log.d("CustomerDisplay", "f.delete():" + f.delete());
+//
+//            }
+//        }
     }
 
 
@@ -490,11 +501,11 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
             if (mCamera!=null)
                 mCamera.release();
             SystemClock.sleep(200);
+
             mCamera = Camera.open(0);
             int rotateDegree = getPreviewRotateDegree(0);
             mCamera.setDisplayOrientation(rotateDegree);
             mSurfaceView.setupGLSurafceView(mGLSurfaceView, true, mCameraMirror, getPreviewRotateDegree(0));
-
 
         }
         if (mCamera != null) {
@@ -543,8 +554,9 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
     @Override
     public void setupChanged(int format, int width, int height) {
         RelativeLayout.LayoutParams relativeLayout= (RelativeLayout.LayoutParams) mGLSurfaceView.getLayoutParams();
-        relativeLayout.topMargin=dh/3+50;
-        relativeLayout.height=dh*2/3;
+        //relativeLayout.topMargin=dh/3+50;
+        relativeLayout.height=dh/3;
+        relativeLayout.width=dh/3;
         mGLSurfaceView.setLayoutParams(relativeLayout);
         mGLSurfaceView.invalidate();
         Log.d("fffffffff", "fffffffffffff");
@@ -600,11 +612,12 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                 if (baoCunBean!=null && baoCunBean.getHoutaidizhi_ks()!=null  ){
                 if (bitmapList.size()>0){
                         new Thread(new Runnable() {
+
                             @Override
                             public void run() {
                                 for (Bitmap bitmap:bitmapList){
-                                    synchronized (bitmap){
 
+                                    synchronized (bitmap){
                                         link_P2(compressImage(bitmap),bitmap);
                                         try {
                                             bitmap.wait();
@@ -678,10 +691,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
     }
 
 
-
-
-
-    public static final int TIMEOUT2 = 1000 * 5;
+    private static final int TIMEOUT2 = 1000 * 5;
     // 1:N 对比
     private void link_P2(final File file, final Bitmap bitmap) {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
@@ -713,10 +723,11 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
         call.enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
+                Log.d("CustomerDisplay", "file.delete():" + file.delete());
                 Log.d("AllConnects", "请求识别失败" + e.getMessage());
                 synchronized (bitmap){
-
                     bitmap.notify();
+                    bitmap.recycle();
                 }
 
             }
@@ -724,12 +735,12 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
             @Override
             public void onResponse(Call call, Response response) throws IOException {
 
-                Log.d("AllConnects", "请求识别成功" + call.request().toString()+file.delete());
+                Log.d("AllConnects", "请求识别成功" + call.request().toString());
                 //获得返回体
                 try {
                     ResponseBody body = response.body();
                     String ss = body.string();
-                    Log.d("AllConnects", "传照片" + ss);
+                   // Log.d("AllConnects", "传照片" + ss);
                     String s2=ss.replace("\\\\u","@!@#u").replace("\\","")
                             .replace("tag\": \"{","tag\":{")
                             .replace("jpg\"}\"","jpg\"}")
@@ -742,7 +753,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                     JsonObject jsonObject = GsonUtil.parse(s2).getAsJsonObject();
                     Gson gson = new Gson();
                     MenBean menBean = gson.fromJson(jsonObject, MenBean.class);
-                    if (menBean.isCan_door_open()){
+                    if (menBean.getPerson().getConfidence()>78){
 
                         Message message=Message.obtain();
                         message.arg1=1;
@@ -750,14 +761,14 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                         handler.sendMessage(message);
                     }
 
-                    Log.d("DetecterActivity", "menBean:" + menBean.isCan_door_open());
 
                 } catch (Exception e) {
                     Log.d("WebsocketPushMsg", e.getMessage()+"");
                 }finally {
-
+                    Log.d("CustomerDisplay", "file.delete():" + file.delete());
                     synchronized (bitmap){
                         bitmap.notify();
+                        bitmap.recycle();
                     }
                 }
 
