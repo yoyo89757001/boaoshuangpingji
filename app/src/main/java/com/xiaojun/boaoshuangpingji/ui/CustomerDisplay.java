@@ -70,6 +70,7 @@ import com.xiaojun.boaoshuangpingji.R;
 
 import com.xiaojun.boaoshuangpingji.beans.BaoCunBean;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunBeanDao;
+import com.xiaojun.boaoshuangpingji.beans.BitmapsBean;
 import com.xiaojun.boaoshuangpingji.beans.MenBean;
 import com.xiaojun.boaoshuangpingji.cookies.CookiesManager;
 import com.xiaojun.boaoshuangpingji.interfaces.RecytviewCash;
@@ -669,9 +670,17 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                 for (AFT_FSDKFace fsdkFace : result){
                     YuvImage yuv = new YuvImage(data, ImageFormat.NV21, mWidth, mHeight, null);
                     ExtByteArrayOutputStream ops = new ExtByteArrayOutputStream();
-                    yuv.compressToJpeg(fsdkFace.getRect(), 100, ops);
+                    Rect rect=fsdkFace.getRect();
+                    Rect rect1=new Rect();
+                    rect1.set((rect.left-80)<0?0:(rect.left-80),(rect.top-80)<0?0:(rect.top-80),(rect.right+80)>width?width:(rect.right+80)
+                            ,(rect.bottom+80)>height?height:(rect.bottom+80));
+
+                    yuv.compressToJpeg(rect1, 100, ops);
+                  //  yuv.compressToJpeg(fsdkFace.getRect(), 100, ops);
                     final Bitmap bmp = BitmapFactory.decodeByteArray(ops.getByteArray(), 0, ops.getByteArray().length);
                     bitmapList.add(bmp);
+                    //推送到主屏---抓脸图片
+                    EventBus.getDefault().post(new BitmapsBean(bmp));
 
                     try {
 

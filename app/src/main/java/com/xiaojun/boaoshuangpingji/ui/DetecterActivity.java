@@ -24,6 +24,7 @@ import com.xiaojun.boaoshuangpingji.MyApplication;
 import com.xiaojun.boaoshuangpingji.R;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunBean;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunBeanDao;
+import com.xiaojun.boaoshuangpingji.beans.BitmapsBean;
 import com.xiaojun.boaoshuangpingji.beans.MenBean;
 import com.xiaojun.boaoshuangpingji.cookies.CookiesManager;
 import com.xiaojun.boaoshuangpingji.utils.CustomerEngine;
@@ -109,6 +110,7 @@ public class DetecterActivity extends Activity {
     private final int TIMEOUT = 1000 * 30;
     private String screen_token = null;
     private static boolean isT = true;
+    private static boolean isB = false;
     private BaoCunBeanDao baoCunBeanDao = MyApplication.myApplication.getDaoSession().getBaoCunBeanDao();
     private BaoCunBean baoCunBean = null;
 
@@ -196,6 +198,9 @@ public class DetecterActivity extends Activity {
     public void onDataSynEvent(MenBean event) {
         if (isT) {
             isT = false;
+            name.setVisibility(View.VISIBLE);
+            jieshao.setVisibility(View.VISIBLE);
+            chongpai.setVisibility(View.GONE);
             baocun.setText("签 到");
             rootLl.setVisibility(View.VISIBLE);
             if (baoCunBean != null && baoCunBean.getHoutaidizhi_ks() != null)
@@ -209,8 +214,6 @@ public class DetecterActivity extends Activity {
                         .into(touxiang);
             name.setText(event.getPerson().getTag().getName());
             jieshao.setText(event.getPerson().getTag().getDepartment());
-
-
         }
 
         Log.e(TAG, "event---->" + event.getPerson().getTag().getAvatar());
@@ -218,11 +221,35 @@ public class DetecterActivity extends Activity {
     }
 
 
+    @Subscribe(threadMode = ThreadMode.MAIN) //在ui线程执行
+    public void onDataSynEvent(BitmapsBean event) {
+        if (isB){
+            isB=false;
+            Glide.with(DetecterActivity.this)
+                    //	.load(R.drawable.vvv)
+                    .load(Bitmap2Bytes(event.getBitmap()))
+                    .error(R.drawable.erroy_bg)
+                    //.apply(myOptions)
+                    .transform(new GlideRoundTransform(MyApplication.getAppContext(), 20))
+                    //.transform(new GlideCircleTransform(MyApplication.getAppContext(),2, Color.parseColor("#ffffffff")))
+                    .into(touxiang);
+        }
+
+    }
+
+   private byte[] Bitmap2Bytes(Bitmap bm) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bm.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        return baos.toByteArray();
+    }
+
     @Override
     protected void onDestroy() {
+        isT = true;
+        isB=false;
         EventBus.getDefault().unregister(this);//解除订阅
         super.onDestroy();
-        isT = true;
+
 
     }
 
@@ -411,11 +438,14 @@ public class DetecterActivity extends Activity {
     public void onViewClicked(View view) {
         switch (view.getId()) {
             case R.id.baoming:
+                isT=false;
                 baocun.setText("保 存");
                 name.setVisibility(View.GONE);
                 jieshao.setVisibility(View.GONE);
                 chongpai.setVisibility(View.VISIBLE);
                 rootLl.setVisibility(View.VISIBLE);
+                isB=true;
+
 
                 break;
             case R.id.baocun:
@@ -432,10 +462,12 @@ public class DetecterActivity extends Activity {
             case R.id.guanbi:
                 rootLl.setVisibility(View.GONE);
                 isT = true;
+                //清Glide图片缓存
+                touxiang.setImageBitmap(null);
 
                 break;
             case R.id.chongpai:
-
+                isB=true;
 
                 break;
         }
