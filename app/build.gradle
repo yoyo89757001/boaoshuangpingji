@@ -83,4 +83,7 @@ dependencies {
     compile 'com.guo.android_extend:android-extend:1.0.1'
     //简化camera 调用
     implementation 'com.android.support:recyclerview-v7:27.1.1'
+    implementation 'com.hanks:htextview-typer:0.1.6'
+    compile 'com.daimajia.easing:library:2.0@aar'//小动画
+    compile 'com.daimajia.androidanimations:library:2.3@aar'//小动画
 }

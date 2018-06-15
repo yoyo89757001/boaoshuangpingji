@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="match_parent">
+
+
+        <RelativeLayout
+            android:background="@drawable/tanchuang_bg"
+            android:layout_width="1366px"
+            android:layout_height="match_parent">
+            <ImageView
+                android:layout_width="280px"
+                android:id="@+id/touxiang"
+                android:layout_marginTop="220px"
+                android:layout_marginLeft="320px"
+                android:scaleType="fitXY"
+                android:layout_height="280px" />
+
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_marginTop="290px"
+                android:layout_marginLeft="20px"
+                android:layout_marginRight="350px"
+                android:layout_toRightOf="@+id/touxiang"
+                android:layout_width="wrap_content"
+                android:gravity="center"
+                android:layout_height="wrap_content">
+
+                <TextView
+                    android:textSize="36px"
+                    android:textColor="@color/write"
+                    android:id="@+id/name"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content" />
+
+                <com.hanks.htextview.typer.TyperTextView
+                    android:layout_width="200px"
+                    android:id="@+id/typerTextView"
+                    android:textSize="32px"
+                    android:layout_height="80px"/>
+
+            </LinearLayout>
+
+
+            <TextView
+                android:id="@+id/zhiwei"
+                android:textSize="26px"
+                android:layout_alignParentBottom="true"
+                android:layout_centerHorizontal="true"
+                android:layout_marginBottom="6px"
+                android:visibility="gone"
+                android:textColor="@color/write"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+
+        </RelativeLayout>
+
+
+
+</LinearLayout>

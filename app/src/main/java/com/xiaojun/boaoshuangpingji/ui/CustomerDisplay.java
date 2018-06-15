@@ -24,6 +24,7 @@ import android.view.Surface;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
@@ -49,6 +50,10 @@ import com.arcsoft.genderestimation.ASGE_FSDKFace;
 import com.arcsoft.genderestimation.ASGE_FSDKGender;
 import com.arcsoft.genderestimation.ASGE_FSDKVersion;
 import com.bumptech.glide.Glide;
+import com.facebook.rebound.SimpleSpringListener;
+import com.facebook.rebound.Spring;
+import com.facebook.rebound.SpringConfig;
+import com.facebook.rebound.SpringSystem;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.guo.android_extend.java.AbsLoop;
@@ -57,6 +62,9 @@ import com.guo.android_extend.tools.CameraHelper;
 import com.guo.android_extend.widget.CameraFrameData;
 import com.guo.android_extend.widget.CameraGLSurfaceView;
 import com.guo.android_extend.widget.CameraSurfaceView;
+import com.hanks.htextview.base.AnimationListener;
+import com.hanks.htextview.base.HTextView;
+import com.hanks.htextview.typer.TyperTextView;
 import com.xiaojun.boaoshuangpingji.MyApplication;
 import com.xiaojun.boaoshuangpingji.R;
 
@@ -71,6 +79,8 @@ import com.xiaojun.boaoshuangpingji.utils.GlideCircleTransform;
 import com.xiaojun.boaoshuangpingji.utils.GsonUtil;
 import com.xiaojun.boaoshuangpingji.utils.Utils;
 import com.yatoooon.screenadaptation.ScreenAdapterTools;
+
+import org.greenrobot.eventbus.EventBus;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -137,6 +147,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
     private BlockingQueue<String> basket = new LinkedBlockingQueue<String>(5);
     private static Vector<MenBean> menBeansList=new Vector<>();
     private static boolean isA=true;
+    private static final String syString="kkkkk";
 
 
     private static Vector<Bitmap> bitmapList=new Vector<>();
@@ -144,7 +155,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
     private final int TIMEOUT=1000*30;
     private  String screen_token=null;
     private LinearLayout linearLayout;
-    private ScrollView scrollView;
+    private HorizontalScrollView scrollView;
     private BaoCunBeanDao baoCunBeanDao=MyApplication.myApplication.getDaoSession().getBaoCunBeanDao();
     private BaoCunBean baoCunBean=null;
 
@@ -157,7 +168,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                 case 999:
 
                     if (menBeansList.size()>0){
-
+                        linearLayout.removeViewAt(0);
                         menBeansList.remove(0);
                     }
 
@@ -179,8 +190,76 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                             }
 
                             if (a == 0) {
+                                //推送到主屏
+                                EventBus.getDefault().post(dataBean);
+
                                 menBeansList.add(dataBean);
-                                int i1 = menBeansList.size();
+                               // int i1 = menBeansList.size();
+                                final View view3 = View.inflate(mContext, R.layout.tanchuang_item213, null);
+                                ScreenAdapterTools.getInstance().loadView(view3);
+                                TextView name3 = (TextView) view3.findViewById(R.id.name);
+                                ImageView touxiang = (ImageView) view3.findViewById(R.id.touxiang);
+                                name3.setText("测试的");
+                                TextView zhiwei = (TextView) view3.findViewById(R.id.zhiwei);
+                                zhiwei.setText("职位");
+                                TyperTextView huanyinyu = (TyperTextView) view3.findViewById(R.id.typerTextView);
+                                huanyinyu.setTyperSpeed(100);
+                                huanyinyu.setCharIncrease(1);
+                                huanyinyu.setAnimationListener(new AnimationListener() {
+                                    @Override
+                                    public void onAnimationEnd(HTextView hTextView) {
+
+
+                                    }
+                                });
+                              //  huanyinyu.setText();
+                                huanyinyu.animateText("dfa法防是非得失发的说");
+
+                                //huanyinyu.setText(hyy);
+                                //synthesizer.speak(hyy==null?"":hyy);
+
+                                Glide.with(mContext)
+                                        //	.load(R.drawable.vvv)
+                                        .load(baoCunBean.getHoutaidizhi_ks()+dataBean.getPerson().getTag().getAvatar())
+                                        .error(R.drawable.erroy_bg)
+                                        //.apply(myOptions)
+                                      //  .transform(new GlideRoundTransform(MyApplication.getAppContext(), 20))
+                                        .transform(new GlideCircleTransform(MyApplication.getAppContext(),2,Color.parseColor("#ffffffff")))
+                                        .into(touxiang);
+
+                                linearLayout.addView(view3);
+
+
+                                new Handler().post(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        scrollView.fullScroll(ScrollView.FOCUS_RIGHT);
+                                    }
+                                });
+
+                                //动画
+                                SpringSystem springSystem3 = SpringSystem.create();
+                                final Spring spring3 = springSystem3.createSpring();
+                                //两个参数分别是弹力系数和阻力系数
+                                spring3.setSpringConfig(SpringConfig.fromOrigamiTensionAndFriction(90, 8));
+                                // 添加弹簧监听器
+                                spring3.addListener(new SimpleSpringListener() {
+                                    @Override
+                                    public void onSpringUpdate(Spring spring) {
+                                        // value是一个符合弹力变化的一个数，我们根据value可以做出弹簧动画
+                                        float value = (float) spring.getCurrentValue();
+                                        //Log.d(TAG, "value:" + value);
+                                        //基于Y轴的弹簧阻尼动画
+                                        //	helper.itemView.setTranslationY(value);
+                                        // 对图片的伸缩动画
+                                        //float scale = 1f - (value * 0.5f);
+                                        view3.setScaleX(value);
+                                        view3.setScaleY(value);
+                                    }
+                                });
+                                // 设置动画结束值
+                                spring3.setEndValue(1f);
+
 //                                adapter.notifyItemInserted(i1);
 //                                manager2.scrollToPosition(i1 - 1);
 
@@ -578,9 +657,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
 //			Log.d(TAG, "Face:" + face.toString());
 //		}
 
-
         AFT_FSDKError err = engine.AFT_FSDK_FaceFeatureDetect(data, width, height, AFT_FSDKEngine.CP_PAF_NV21, result);
-
         if (isA) {
             isA=false;
             final int size=result.size();
@@ -617,10 +694,10 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                             public void run() {
                                 for (Bitmap bitmap:bitmapList){
 
-                                    synchronized (bitmap){
-                                        link_P2(compressImage(bitmap),bitmap);
+                                    synchronized (syString){
+                                        link_P2(compressImage(bitmap));
                                         try {
-                                            bitmap.wait();
+                                            syString.wait();
                                         } catch (InterruptedException e) {
                                             e.printStackTrace();
                                             isA=true;
@@ -693,7 +770,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
 
     private static final int TIMEOUT2 = 1000 * 5;
     // 1:N 对比
-    private void link_P2(final File file, final Bitmap bitmap) {
+    private void link_P2(final File file) {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .writeTimeout(TIMEOUT2, TimeUnit.MILLISECONDS)
                 .connectTimeout(TIMEOUT2, TimeUnit.MILLISECONDS)
@@ -725,9 +802,9 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
             public void onFailure(Call call, IOException e) {
                 Log.d("CustomerDisplay", "file.delete():" + file.delete());
                 Log.d("AllConnects", "请求识别失败" + e.getMessage());
-                synchronized (bitmap){
-                    bitmap.notify();
-                    bitmap.recycle();
+                synchronized (syString){
+                    syString.notify();
+
                 }
 
             }
@@ -766,9 +843,9 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                     Log.d("WebsocketPushMsg", e.getMessage()+"");
                 }finally {
                     Log.d("CustomerDisplay", "file.delete():" + file.delete());
-                    synchronized (bitmap){
-                        bitmap.notify();
-                        bitmap.recycle();
+                    synchronized (syString){
+                        syString.notify();
+
                     }
                 }
 
