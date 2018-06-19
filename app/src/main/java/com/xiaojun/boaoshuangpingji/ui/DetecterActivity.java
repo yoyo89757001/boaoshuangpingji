@@ -20,6 +20,7 @@ import com.airbnb.lottie.L;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.sdsmdg.tastytoast.TastyToast;
 import com.xiaojun.boaoshuangpingji.MyApplication;
 import com.xiaojun.boaoshuangpingji.R;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunBean;
@@ -113,6 +114,7 @@ public class DetecterActivity extends Activity {
     private static boolean isB = false;
     private BaoCunBeanDao baoCunBeanDao = MyApplication.myApplication.getDaoSession().getBaoCunBeanDao();
     private BaoCunBean baoCunBean = null;
+    private MenBean menBeans=null;
 
     public Handler handler = new Handler(new Handler.Callback() {
 
@@ -198,6 +200,7 @@ public class DetecterActivity extends Activity {
     public void onDataSynEvent(MenBean event) {
         if (isT) {
             isT = false;
+            menBeans=event;
             name.setVisibility(View.VISIBLE);
             jieshao.setVisibility(View.VISIBLE);
             chongpai.setVisibility(View.GONE);
@@ -213,6 +216,7 @@ public class DetecterActivity extends Activity {
                         //.transform(new GlideCircleTransform(MyApplication.getAppContext(),2, Color.parseColor("#ffffffff")))
                         .into(touxiang);
             name.setText(event.getPerson().getTag().getName());
+            a1.setText(event.getPerson().getTag().getName());
             jieshao.setText(event.getPerson().getTag().getDepartment());
         }
 
@@ -255,7 +259,7 @@ public class DetecterActivity extends Activity {
 
 
     //首先登录-->获取所有主机-->创建或者删除或者更新门禁
-    private void getOkHttpClient2() {
+    private void qiandao(String id) {
         okHttpClient = new OkHttpClient.Builder()
                 .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
                 .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
@@ -265,17 +269,30 @@ public class DetecterActivity extends Activity {
                 .build();
 
         RequestBody body = new FormBody.Builder()
-                .add("username", "test@megvii.com")
-                .add("password", "123456")
-                .add("pad_id", Utils.getIMSI())
-                .add("device_type", "2")
+                .add("exhibitionId", baoCunBean.getZhanhuiId())
+                .add("subjectId", id)
+                .add("name", a1.getText().toString().trim()) //姓名
+                .add("sexs", a7.getText().toString().trim()) //男女
+                .add("job", a8.getText().toString().trim()) //职位
+                .add("phone", a3.getText().toString().trim()) //电话
+                .add("email",a9.getText().toString().trim()) //邮箱
+                .add("companyName",a4.getText().toString().trim()) //公司名称
+                .add("companyAddress", a10.getText().toString().trim()) //公司地址
+                .add("contact", a5.getText().toString().trim()) //联系人
+                .add("contact_way", a11.getText().toString().trim()) //联系方式
+                .add("roomNumber", a6.getText().toString().trim()) //房间号
+                .add("industry", a12.getText().toString().trim()) //行业类别
+                .add("province",a2.getText().toString().trim())  //省份
+                .add("city", a2.getText().toString().trim())  //市级单位
                 .build();
 
         Request.Builder requestBuilder = new Request.Builder();
-        requestBuilder.header("User-Agent", "Koala Admin");
+       // requestBuilder.header("User-Agent", "Koala Admin");
         requestBuilder.header("Content-Type", "application/json");
         requestBuilder.post(body);
-        requestBuilder.url("http://192.168.2.64" + "/pad/login");
+        requestBuilder.url(baoCunBean.getHoutaiDiZhi() + "/addSubjectExhibition.do");
+        //Log.d("DetecterActivity", baoCunBean.getHoutaiDiZhi()+"地址");
+       // Log.d("DetecterActivity", baoCunBean.getZhanhuiId()+"展会id");
         final Request request = requestBuilder.build();
 
         Call mcall = okHttpClient.newCall(request);
@@ -287,19 +304,49 @@ public class DetecterActivity extends Activity {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                String s = response.body().string();
-                Log.d(TAG, "登录" + s);
-                JsonObject jsonObject = GsonUtil.parse(s).getAsJsonObject();
-                int n = 1;
-                n = jsonObject.get("code").getAsInt();
-                if (n == 0) {
-                    //登录成功,后续的连接操作因为cookies 原因,要用 MyApplication.okHttpClient
-                    JsonObject jo = jsonObject.get("data").getAsJsonObject();
-                    screen_token = jo.get("screen_token").getAsString();
-                    Log.d("DetecterActivity", screen_token);
-                } else {
+                try {
+                    String s = response.body().string();
+                    Log.d(TAG, "登录" + s);
+                    JsonObject jsonObject = GsonUtil.parse(s).getAsJsonObject();
+                    int n = 1;
+                    n = jsonObject.get("dtoResult").getAsInt();
+                    final String ppp=jsonObject.get("dtoDesc").getAsString();
+                    if (n == 0) {
+                        //登录成功,后续的连接操作因为cookies 原因,要用 MyApplication.okHttpClient
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                TastyToast.makeText(DetecterActivity.this,"签到成功",TastyToast.LENGTH_SHORT,TastyToast.INFO).show();
+                                rootLl.setVisibility(View.GONE);
+                                isT = true;
+                                //清Glide图片缓存
+                                touxiang.setImageBitmap(null);
+                                chongzhi();
+                            }
+                        });
 
+
+                    }else {
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                TastyToast.makeText(DetecterActivity.this,ppp,TastyToast.LENGTH_SHORT,TastyToast.INFO).show();
+
+                            }
+                        });
+
+                    }
+                }catch (Exception e){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            TastyToast.makeText(DetecterActivity.this,"签到异常",TastyToast.LENGTH_SHORT,TastyToast.INFO).show();
+
+                        }
+                    });
+                    Log.d("DetecterActivity", e.getMessage()+"");
                 }
+
             }
         });
 
@@ -309,7 +356,7 @@ public class DetecterActivity extends Activity {
     public static final int TIMEOUT2 = 1000 * 5;
 
     // 1:N 对比
-    private void link_P2(final File file, final int size) {
+    private void link_qiandao(final File file, final int size) {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .writeTimeout(TIMEOUT2, TimeUnit.MILLISECONDS)
                 .connectTimeout(TIMEOUT2, TimeUnit.MILLISECONDS)
@@ -454,6 +501,8 @@ public class DetecterActivity extends Activity {
 
                 }else {
                     Log.d("DetecterActivity", "保存签到信息");
+                    if (menBeans!=null)
+                    qiandao(menBeans.getPerson().getTag().getJob_number());
 
                 }
 
@@ -464,6 +513,7 @@ public class DetecterActivity extends Activity {
                 isT = true;
                 //清Glide图片缓存
                 touxiang.setImageBitmap(null);
+                chongzhi();
 
                 break;
             case R.id.chongpai:
@@ -471,6 +521,21 @@ public class DetecterActivity extends Activity {
 
                 break;
         }
+    }
+
+    public void chongzhi(){
+        a1.setText("");
+        a2.setText("");
+        a3.setText("");
+        a4.setText("");
+        a5.setText("");
+        a6.setText("");
+        a7.setText("");
+        a8.setText("");
+        a9.setText("");
+        a10.setText("");
+        a11.setText("");
+        a12.setText("");
     }
 
 
