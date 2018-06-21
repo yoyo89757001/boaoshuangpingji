@@ -1,20 +1,61 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:background="@drawable/p1_bg"
+    android:background="@drawable/bg1"
     android:layout_height="match_parent" >
 
-    <com.guo.android_extend.widget.CameraSurfaceView
-        android:id="@+id/surfaceView"
-        android:layout_width="1dp"
-        android:layout_height="1dp"/>
 
-    <com.guo.android_extend.widget.CameraGLSurfaceView
-        android:id="@+id/glsurfaceView"
-        android:layout_marginTop="370px"
+    <LinearLayout
+        android:orientation="horizontal"
+        android:gravity="center_horizontal"
+        android:layout_centerInParent="true"
         android:layout_width="match_parent"
-        android:layout_centerHorizontal="true"
-        android:layout_height="match_parent"/>
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:src="@drawable/logo"
+            android:layout_width="100px"
+            android:layout_height="100px" />
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:gravity="center"
+            android:layout_marginLeft="20px"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:textSize="40px"
+                android:id="@+id/rrr"
+                android:textColor="@color/write"
+                android:text="博鳌·21世纪房地产论坛第18届年会"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:textSize="16px"
+                android:id="@+id/ttt"
+                android:layout_marginTop="2px"
+                android:textColor="@color/write"
+                android:text="THE 18TH ANNUAL CONFERENCE OF BOAO 21ST CENTURY REAL ESTATE FORUM"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+            <TextView
+                android:textSize="32px"
+                android:id="@+id/ttt3"
+                android:layout_marginTop="30px"
+                android:textColor="@color/write"
+                android:text="潮平风正：美好住居新航海"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
+
+        </LinearLayout>
+
+
+    </LinearLayout>
+
+
 
     <HorizontalScrollView
         android:id="@+id/scrollView"
@@ -31,6 +72,16 @@
         </LinearLayout>
     </HorizontalScrollView>
 
+    <com.guo.android_extend.widget.CameraSurfaceView
+        android:id="@+id/surfaceView"
+        android:layout_width="1dp"
+        android:layout_height="1dp"/>
 
+    <com.guo.android_extend.widget.CameraGLSurfaceView
+        android:id="@+id/glsurfaceView"
+        android:layout_width="match_parent"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
+        android:layout_height="match_parent"/>
 
 </RelativeLayout>
