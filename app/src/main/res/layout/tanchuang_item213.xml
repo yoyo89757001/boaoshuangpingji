@@ -6,54 +6,71 @@
 
 
         <RelativeLayout
-            android:background="@drawable/tbg2"
             android:layout_width="1366px"
             android:layout_height="match_parent">
-            <ImageView
-                android:layout_width="280px"
-                android:id="@+id/touxiang"
-                android:layout_marginTop="220px"
-                android:layout_marginLeft="320px"
-                android:scaleType="fitXY"
-                android:layout_height="280px" />
 
+            <RelativeLayout
+                android:layout_centerInParent="true"
+                android:background="@drawable/tbg2"
+                android:layout_width="1000px"
+                android:layout_height="600px">
 
-            <LinearLayout
-                android:orientation="vertical"
-                android:layout_marginTop="290px"
-                android:layout_marginLeft="20px"
-                android:layout_marginRight="350px"
-                android:layout_toRightOf="@+id/touxiang"
-                android:layout_width="wrap_content"
-                android:gravity="center"
-                android:layout_height="wrap_content">
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_marginTop="200px"
+                    android:layout_marginLeft="120px"
+                    android:layout_marginRight="250px"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content">
+
+                    <ImageView
+                        android:src="@drawable/qiandaoggg"
+                        android:layout_width="120px"
+                        android:layout_height="40px" />
+
+                    <TextView
+                        android:textSize="36px"
+                        android:layout_marginTop="10px"
+                        android:textColor="@color/write"
+                        android:id="@+id/name"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+
+                    <com.hanks.htextview.typer.TyperTextView
+                        android:layout_width="wrap_content"
+                        android:id="@+id/typerTextView"
+                        android:layout_marginTop="10px"
+                        android:textSize="32px"
+                        android:layout_height="wrap_content"/>
+
+                </LinearLayout>
+
 
                 <TextView
-                    android:textSize="36px"
+                    android:id="@+id/zhiwei"
+                    android:textSize="26px"
+                    android:layout_alignParentBottom="true"
+                    android:layout_centerHorizontal="true"
+                    android:layout_marginBottom="6px"
+                    android:visibility="gone"
                     android:textColor="@color/write"
-                    android:id="@+id/name"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content" />
 
-                <com.hanks.htextview.typer.TyperTextView
-                    android:layout_width="200px"
-                    android:id="@+id/typerTextView"
-                    android:textSize="32px"
-                    android:layout_height="80px"/>
 
-            </LinearLayout>
+            </RelativeLayout>
 
 
-            <TextView
-                android:id="@+id/zhiwei"
-                android:textSize="26px"
-                android:layout_alignParentBottom="true"
-                android:layout_centerHorizontal="true"
-                android:layout_marginBottom="6px"
-                android:visibility="gone"
-                android:textColor="@color/write"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content" />
+
+
+            <ImageView
+                android:layout_alignParentRight="true"
+                android:layout_width="230px"
+                android:id="@+id/touxiang"
+                android:layout_marginRight="170px"
+                android:layout_marginTop="400px"
+                android:scaleType="fitXY"
+                android:layout_height="260px" />
 
 
         </RelativeLayout>

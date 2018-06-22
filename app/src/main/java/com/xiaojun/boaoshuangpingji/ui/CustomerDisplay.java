@@ -18,11 +18,11 @@ import android.os.SystemClock;
 
 import android.util.Log;
 import android.view.Display;
-import android.view.LayoutInflater;
+
 import android.view.MotionEvent;
 import android.view.Surface;
 import android.view.View;
-import android.view.ViewGroup;
+
 import android.view.WindowManager;
 import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
@@ -31,7 +31,7 @@ import android.widget.RelativeLayout;
 import android.widget.ScrollView;
 import android.widget.TextView;
 
-import com.arcsoft.ageestimation.ASAE_FSDKAge;
+
 import com.arcsoft.ageestimation.ASAE_FSDKEngine;
 import com.arcsoft.ageestimation.ASAE_FSDKError;
 import com.arcsoft.ageestimation.ASAE_FSDKFace;
@@ -47,7 +47,7 @@ import com.arcsoft.facetracking.AFT_FSDKVersion;
 import com.arcsoft.genderestimation.ASGE_FSDKEngine;
 import com.arcsoft.genderestimation.ASGE_FSDKError;
 import com.arcsoft.genderestimation.ASGE_FSDKFace;
-import com.arcsoft.genderestimation.ASGE_FSDKGender;
+
 import com.arcsoft.genderestimation.ASGE_FSDKVersion;
 import com.bumptech.glide.Glide;
 import com.facebook.rebound.SimpleSpringListener;
@@ -75,32 +75,36 @@ import com.xiaojun.boaoshuangpingji.beans.MenBean;
 import com.xiaojun.boaoshuangpingji.cookies.CookiesManager;
 import com.xiaojun.boaoshuangpingji.interfaces.RecytviewCash;
 import com.xiaojun.boaoshuangpingji.utils.FaceDB;
-import com.xiaojun.boaoshuangpingji.utils.FileUtil;
-import com.xiaojun.boaoshuangpingji.utils.GlideCircleTransform;
+
+
+import com.xiaojun.boaoshuangpingji.utils.GlideRoundTransform;
 import com.xiaojun.boaoshuangpingji.utils.GsonUtil;
 import com.xiaojun.boaoshuangpingji.utils.Utils;
 import com.yatoooon.screenadaptation.ScreenAdapterTools;
 
 import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
-import java.io.ByteArrayOutputStream;
+import java.io.BufferedOutputStream;
+
 import java.io.File;
-import java.io.FileNotFoundException;
+
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.text.SimpleDateFormat;
+
 import java.util.ArrayList;
-import java.util.Date;
+
 import java.util.List;
 import java.util.Objects;
 import java.util.Vector;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.LinkedBlockingQueue;
+
+
 import java.util.concurrent.TimeUnit;
 
 import okhttp3.Call;
 import okhttp3.Callback;
-import okhttp3.FormBody;
+
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -131,34 +135,37 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
     ASGE_FSDKVersion mGenderVersion = new ASGE_FSDKVersion();
     ASGE_FSDKEngine mGenderEngine = new ASGE_FSDKEngine();
     List<AFT_FSDKFace> result = new ArrayList<>();
-    List<AFT_FSDKFace> result2 = new ArrayList<>();
-    List<ASAE_FSDKAge> ages = new ArrayList<>();
-    List<ASGE_FSDKGender> genders = new ArrayList<>();
+    //List<AFT_FSDKFace> result2 = new ArrayList<>();
+   // List<ASAE_FSDKAge> ages = new ArrayList<>();
+  //  List<ASGE_FSDKGender> genders = new ArrayList<>();
 
     private int dw,dh;
-    private OkHttpClient okHttpClient=null;
+  //  private OkHttpClient okHttpClient=null;
     int mCameraID;
     int mCameraRotate;
     boolean mCameraMirror;
-    byte[] mImageNV21 = null;
+  //  byte[] mImageNV21 = null;
     FRAbsLoop mFRAbsLoop = null;
-    AFT_FSDKFace mAFT_FSDKFace = null;
+   // AFT_FSDKFace mAFT_FSDKFace = null;
     Handler mHandler;
 
-    private BlockingQueue<String> basket = new LinkedBlockingQueue<String>(5);
+  //  private BlockingQueue<String> basket = new LinkedBlockingQueue<String>(5);
     private static Vector<MenBean> menBeansList=new Vector<>();
     private static boolean isA=true;
     private static final String syString="kkkkk";
-
-
     private static Vector<Bitmap> bitmapList=new Vector<>();
+    private static boolean isMsr=true;
+    private static boolean isYG=true;
+    private static int counts=0;
 
-    private final int TIMEOUT=1000*30;
+   // private final int TIMEOUT=1000*30;
     private  String screen_token=null;
     private LinearLayout linearLayout;
     private HorizontalScrollView scrollView;
     private BaoCunBeanDao baoCunBeanDao=MyApplication.myApplication.getDaoSession().getBaoCunBeanDao();
     private BaoCunBean baoCunBean=null;
+
+
 
     public  Handler handler=new Handler(new Handler.Callback() {
 
@@ -172,6 +179,14 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                         linearLayout.removeViewAt(0);
                         menBeansList.remove(0);
                     }
+
+                    break;
+                case 2:
+                    //发送陌生人广播 报名
+
+                    BitmapsBean bitmapsBean= (BitmapsBean) msg.obj;
+                    EventBus.getDefault().post(bitmapsBean);
+
 
                     break;
             }
@@ -191,9 +206,12 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                             }
 
                             if (a == 0) {
-                                //推送到主屏
-                                EventBus.getDefault().post(dataBean);
-
+                                //推送到主屏 签到
+                                if (isYG){
+                                    isMsr=false;
+                                    isYG=false;
+                                    EventBus.getDefault().post(dataBean);
+                                }
                                 menBeansList.add(dataBean);
                                // int i1 = menBeansList.size();
                                 final View view3 = View.inflate(mContext, R.layout.tanchuang_item213, null);
@@ -214,7 +232,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                                     }
                                 });
                               //  huanyinyu.setText();
-                                huanyinyu.animateText("dfa法防是非得失发的说");
+                                huanyinyu.animateText("测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试");
 
                                 //huanyinyu.setText(hyy);
                                 //synthesizer.speak(hyy==null?"":hyy);
@@ -223,9 +241,11 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                                         //	.load(R.drawable.vvv)
                                         .load(baoCunBean.getHoutaidizhi_ks()+dataBean.getPerson().getTag().getAvatar())
                                         .error(R.drawable.erroy_bg)
+                                        .placeholder(R.drawable.logoxiao) // can also be a drawable
+                                        .crossFade(400)
                                         //.apply(myOptions)
-                                      //  .transform(new GlideRoundTransform(MyApplication.getAppContext(), 20))
-                                        .transform(new GlideCircleTransform(MyApplication.getAppContext(),2,Color.parseColor("#ffffffff")))
+                                        .transform(new GlideRoundTransform(MyApplication.getAppContext(), 20))
+                                       // .transform(new GlideCircleTransform(MyApplication.getAppContext(),2,Color.parseColor("#ffffffff")))
                                         .into(touxiang);
 
                                 linearLayout.addView(view3);
@@ -453,6 +473,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
 
         dw = Utils.getDisplaySize(mContext).x;
         dh = Utils.getDisplaySize(mContext).y;
+        EventBus.getDefault().register(this);//订阅
 
         setContentView(R.layout.view_display_customer);
         //ScreenAdapterTools.getInstance().reset(this);//如果希望android7.0分屏也适配的话,加上这句
@@ -503,7 +524,14 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
     }
 
 
+    @Subscribe(threadMode = ThreadMode.MAIN) //在ui线程执行
+    public void onDataSynEvent(String event) {
+        Log.d("CustomerDisplay", event+"ttttttttttttttttttttttt");
+            isMsr=true;
+            isYG=true;
 
+
+    }
 
 
     @Override
@@ -515,6 +543,8 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
 
     @Override
     public void onDisplayRemoved() {
+
+        EventBus.getDefault().unregister(this);//解除订阅
         super.onDisplayRemoved();
     }
 
@@ -679,8 +709,8 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                   //  yuv.compressToJpeg(fsdkFace.getRect(), 100, ops);
                     final Bitmap bmp = BitmapFactory.decodeByteArray(ops.getByteArray(), 0, ops.getByteArray().length);
                     bitmapList.add(bmp);
-                    //推送到主屏---抓脸图片
-                    EventBus.getDefault().post(new BitmapsBean(bmp));
+//                    //推送到主屏---抓脸图片
+//                    EventBus.getDefault().post(new BitmapsBean(bmp));
 
                     try {
 
@@ -704,7 +734,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                                 for (Bitmap bitmap:bitmapList){
 
                                     synchronized (syString){
-                                        link_P2(compressImage(bitmap));
+                                        link_P2(compressImage(bitmap),bitmap);
                                         try {
                                             syString.wait();
                                         } catch (InterruptedException e) {
@@ -779,7 +809,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
 
     private static final int TIMEOUT2 = 1000 * 5;
     // 1:N 对比
-    private void link_P2(final File file) {
+    private void link_P2(final File file, final Bitmap bitmap) {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .writeTimeout(TIMEOUT2, TimeUnit.MILLISECONDS)
                 .connectTimeout(TIMEOUT2, TimeUnit.MILLISECONDS)
@@ -834,17 +864,37 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                             .replace("0}\"","0}");
 
 
-                    Log.d("AllConnects", "传照片2" + s2);
+                //    Log.d("AllConnects", "传照片2" + s2);
 
                     JsonObject jsonObject = GsonUtil.parse(s2).getAsJsonObject();
                     Gson gson = new Gson();
                     MenBean menBean = gson.fromJson(jsonObject, MenBean.class);
-                    if (menBean.getPerson().getConfidence()>78){
-
+                    if (menBean.isCan_door_open() || (menBean.getPerson()!=null && menBean.getPerson().getConfidence()>78)){
+                        counts=0;
                         Message message=Message.obtain();
                         message.arg1=1;
                         message.obj=menBean;
                         handler.sendMessage(message);
+                        Log.d("CustomerDisplay", "识别");
+
+                    }else {
+                       if (menBean.getError()==7){
+                           //陌生人频率过快稍微降低点
+                           counts++;
+                           Log.d("CustomerDisplay", "陌生人"+counts);
+                           if (counts>=2){
+                               counts=0;
+                           if (isMsr){
+                               isYG=false;
+                               isMsr=false;
+                               Message message=Message.obtain();
+                               message.what=2;
+                               message.obj=new BitmapsBean(bitmap.copy(Bitmap.Config.ARGB_8888,false));
+                               handler.sendMessage(message);
+                           }
+                       }
+
+                       }
                     }
 
 
@@ -853,6 +903,8 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                 }finally {
                     Log.d("CustomerDisplay", "file.delete():" + file.delete());
                     synchronized (syString){
+                        if (bitmap!=null)
+                            bitmap.recycle();
                         syString.notify();
 
                     }
@@ -867,35 +919,46 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
      * 压缩图片（质量压缩）
      * @param bitmap
      */
-    public static File compressImage(Bitmap bitmap) {
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);//质量压缩方法，这里100表示不压缩，把压缩后的数据存放到baos中
-        int options = 100;
-        while (baos.toByteArray().length / 1024 > 300) {  //循环判断如果压缩后图片是否大于500kb,大于继续压缩
-            baos.reset();//重置baos即清空baos
-            options -= 10;//每次都减少10
-            bitmap.compress(Bitmap.CompressFormat.JPEG, options, baos);//这里压缩options%，把压缩后的数据存放到baos中
-            //long length = baos.toByteArray().length;
-        }
-        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
-        Date date = new Date(System.currentTimeMillis());
-        String filename = format.format(date);
-        File file = new File(Environment.getExternalStorageDirectory(),filename+".png");
+    private static File compressImage(Bitmap bitmap) {
+        File file=new File(Environment.getExternalStorageDirectory(),System.currentTimeMillis()+".png");//将要保存图片的路径
         try {
-            FileOutputStream fos = new FileOutputStream(file);
-            try {
-                fos.write(baos.toByteArray());
-                fos.flush();
-                fos.close();
-            } catch (IOException e) {
-
-                e.printStackTrace();
-            }
-        } catch (FileNotFoundException e) {
-
+            BufferedOutputStream bos = new BufferedOutputStream(new FileOutputStream(file));
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, bos);
+            bos.flush();
+            bos.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
-        //	recycleBitmap(bitmap);
         return file;
+
+//        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+//        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);//质量压缩方法，这里100表示不压缩，把压缩后的数据存放到baos中
+//        int options = 100;
+//        while (baos.toByteArray().length / 1024 > 300) {  //循环判断如果压缩后图片是否大于500kb,大于继续压缩
+//            baos.reset();//重置baos即清空baos
+//            options -= 10;//每次都减少10
+//            bitmap.compress(Bitmap.CompressFormat.JPEG, options, baos);//这里压缩options%，把压缩后的数据存放到baos中
+//            //long length = baos.toByteArray().length;
+//        }
+//        SimpleDateFormat format = new SimpleDateFormat("yyyyMMddHHmmss");
+//        Date date = new Date(System.currentTimeMillis());
+//        String filename = format.format(date);
+//        File file = new File(Environment.getExternalStorageDirectory(),filename+".png");
+//        try {
+//            FileOutputStream fos = new FileOutputStream(file);
+//            try {
+//                fos.write(baos.toByteArray());
+//                fos.flush();
+//                fos.close();
+//            } catch (IOException e) {
+//
+//                e.printStackTrace();
+//            }
+//        } catch (FileNotFoundException e) {
+//
+//            e.printStackTrace();
+//        }
+//        //	recycleBitmap(bitmap);
+//        return file;
     }
 }

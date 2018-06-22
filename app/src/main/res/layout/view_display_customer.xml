@@ -44,7 +44,7 @@
             <TextView
                 android:textSize="32px"
                 android:id="@+id/ttt3"
-                android:layout_marginTop="30px"
+                android:layout_marginTop="50px"
                 android:textColor="@color/write"
                 android:text="潮平风正：美好住居新航海"
                 android:layout_width="wrap_content"
@@ -55,10 +55,18 @@
 
     </LinearLayout>
 
+    <ImageView
+        android:layout_marginTop="20px"
+        android:layout_marginLeft="20px"
+        android:src="@drawable/ruitong_logo"
+        android:layout_width="160px"
+        android:layout_height="38px" />
+
 
 
     <HorizontalScrollView
         android:id="@+id/scrollView"
+        android:scrollbars="none"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content">
         <LinearLayout
@@ -80,7 +88,6 @@
     <com.guo.android_extend.widget.CameraGLSurfaceView
         android:id="@+id/glsurfaceView"
         android:layout_width="match_parent"
-        android:layout_alignParentRight="true"
         android:layout_alignParentBottom="true"
         android:layout_height="match_parent"/>
 

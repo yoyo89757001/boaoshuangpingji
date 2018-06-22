@@ -1,6 +1,7 @@
 package com.xiaojun.boaoshuangpingji.ui;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
@@ -28,10 +29,13 @@ import com.xiaojun.boaoshuangpingji.beans.BaoCunBeanDao;
 import com.xiaojun.boaoshuangpingji.beans.BitmapsBean;
 import com.xiaojun.boaoshuangpingji.beans.MenBean;
 import com.xiaojun.boaoshuangpingji.cookies.CookiesManager;
+import com.xiaojun.boaoshuangpingji.dialogs.ChaXunDialog;
+import com.xiaojun.boaoshuangpingji.dialogs.XinXiDialog;
 import com.xiaojun.boaoshuangpingji.utils.CustomerEngine;
 import com.xiaojun.boaoshuangpingji.utils.GlideRoundTransform;
 import com.xiaojun.boaoshuangpingji.utils.GsonUtil;
 import com.xiaojun.boaoshuangpingji.utils.Utils;
+import com.yatoooon.screenadaptation.ScreenAdapterTools;
 
 import org.greenrobot.eventbus.EventBus;
 import org.greenrobot.eventbus.Subscribe;
@@ -172,6 +176,8 @@ public class DetecterActivity extends Activity {
         super.onCreate(savedInstanceState);
         baoCunBean = baoCunBeanDao.load(123456L);
         setContentView(R.layout.activity_camera);
+        ScreenAdapterTools.getInstance().loadView(getWindow().getDecorView());
+
         ButterKnife.bind(this);
         EventBus.getDefault().register(this);//订阅
 
@@ -198,27 +204,45 @@ public class DetecterActivity extends Activity {
 
     @Subscribe(threadMode = ThreadMode.MAIN) //在ui线程执行
     public void onDataSynEvent(MenBean event) {
-        if (isT) {
-            isT = false;
-            menBeans=event;
-            name.setVisibility(View.VISIBLE);
-            jieshao.setVisibility(View.VISIBLE);
-            chongpai.setVisibility(View.GONE);
-            baocun.setText("签 到");
-            rootLl.setVisibility(View.VISIBLE);
-            if (baoCunBean != null && baoCunBean.getHoutaidizhi_ks() != null)
-                Glide.with(DetecterActivity.this)
-                        //	.load(R.drawable.vvv)
-                        .load(baoCunBean.getHoutaidizhi_ks() + event.getPerson().getTag().getAvatar())
-                        .error(R.drawable.erroy_bg)
-                        //.apply(myOptions)
-                        .transform(new GlideRoundTransform(MyApplication.getAppContext(), 20))
-                        //.transform(new GlideCircleTransform(MyApplication.getAppContext(),2, Color.parseColor("#ffffffff")))
-                        .into(touxiang);
-            name.setText(event.getPerson().getTag().getName());
-            a1.setText(event.getPerson().getTag().getName());
-            jieshao.setText(event.getPerson().getTag().getDepartment());
-        }
+
+        final XinXiDialog chaXunDialog=new XinXiDialog(DetecterActivity.this);
+        chaXunDialog.setOnQueRenListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chaXunDialog.dismiss();
+            }
+        });
+        chaXunDialog.setCanceledOnTouchOutside(false);
+        chaXunDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+
+                EventBus.getDefault().post("xinxi");
+
+                Log.d("DetecterActivity", "关闭信息弹窗");
+            }
+        });
+        chaXunDialog.show();
+
+//            menBeans=event;
+//            name.setVisibility(View.VISIBLE);
+//            jieshao.setVisibility(View.VISIBLE);
+//            chongpai.setVisibility(View.GONE);
+//            baocun.setText("签 到");
+//            rootLl.setVisibility(View.VISIBLE);
+//            if (baoCunBean != null && baoCunBean.getHoutaidizhi_ks() != null)
+//                Glide.with(DetecterActivity.this)
+//                        //	.load(R.drawable.vvv)
+//                        .load(baoCunBean.getHoutaidizhi_ks() + event.getPerson().getTag().getAvatar())
+//                        .error(R.drawable.erroy_bg)
+//                        //.apply(myOptions)
+//                        .transform(new GlideRoundTransform(MyApplication.getAppContext(), 20))
+//                        //.transform(new GlideCircleTransform(MyApplication.getAppContext(),2, Color.parseColor("#ffffffff")))
+//                        .into(touxiang);
+//            name.setText(event.getPerson().getTag().getName());
+//            a1.setText(event.getPerson().getTag().getName());
+//            jieshao.setText(event.getPerson().getTag().getDepartment());
+
 
         Log.e(TAG, "event---->" + event.getPerson().getTag().getAvatar());
 
@@ -227,8 +251,27 @@ public class DetecterActivity extends Activity {
 
     @Subscribe(threadMode = ThreadMode.MAIN) //在ui线程执行
     public void onDataSynEvent(BitmapsBean event) {
-        if (isB){
-            isB=false;
+
+        Log.d("DetecterActivity", "fddsf");
+        final ChaXunDialog chaXunDialog=new ChaXunDialog(DetecterActivity.this);
+        chaXunDialog.setOnQueRenListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                chaXunDialog.dismiss();
+            }
+        });
+        chaXunDialog.setCanceledOnTouchOutside(false);
+        chaXunDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+            @Override
+            public void onDismiss(DialogInterface dialog) {
+
+                EventBus.getDefault().post("msr");
+
+                Log.d("DetecterActivity", "关闭陌生人弹窗");
+            }
+        });
+        chaXunDialog.show();
+
             Glide.with(DetecterActivity.this)
                     //	.load(R.drawable.vvv)
                     .load(Bitmap2Bytes(event.getBitmap()))
@@ -237,7 +280,7 @@ public class DetecterActivity extends Activity {
                     .transform(new GlideRoundTransform(MyApplication.getAppContext(), 20))
                     //.transform(new GlideCircleTransform(MyApplication.getAppContext(),2, Color.parseColor("#ffffffff")))
                     .into(touxiang);
-        }
+
 
     }
 
@@ -249,8 +292,7 @@ public class DetecterActivity extends Activity {
 
     @Override
     protected void onDestroy() {
-        isT = true;
-        isB=false;
+
         EventBus.getDefault().unregister(this);//解除订阅
         super.onDestroy();
 

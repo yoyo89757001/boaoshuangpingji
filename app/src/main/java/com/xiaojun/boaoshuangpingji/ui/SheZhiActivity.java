@@ -439,7 +439,7 @@ public class SheZhiActivity extends Activity implements View.OnClickListener, Vi
                                 baoCunBean=baoCunBeanDao.load(123456L);
                                 try {
 
-//                                    getOkHttpClient2(dialog2.getGuangGaoJiMing(),dialog2.getZhangHuId(),dialog2.getContents());
+                                    getOkHttpClient(baoCunBean.getZhanhuiId());
 
                                 }catch (Exception e){
                                     Log.d("SheZhiActivity", e.getMessage());
@@ -917,6 +917,76 @@ public class SheZhiActivity extends Activity implements View.OnClickListener, Vi
         }
     }
 
+    //后台信息
+    private void getOkHttpClient(String id){
+        Log.d("SheZhiActivity", "jddddddddddddddddd");
+
+        okHttpClient = new OkHttpClient.Builder()
+                .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                .cookieJar(new CookiesManager())
+                .retryOnConnectionFailure(true)
+                .build();
+
+        RequestBody body = new FormBody.Builder()
+                .add("id", id)
+                .build();
+
+        Request.Builder requestBuilder = new Request.Builder();
+        //requestBuilder.header("User-Agent", "Koala Admin");
+        requestBuilder.header("Content-Type","application/json");
+        requestBuilder.post(body);
+        requestBuilder.url(baoCunBean.getHoutaiDiZhi()+"/qryExhibitionById.do");
+        final Request request = requestBuilder.build();
+
+        Call mcall= okHttpClient.newCall(request);
+        mcall.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        TastyToast.makeText(SheZhiActivity.this,"查询失败",TastyToast.LENGTH_LONG,TastyToast.ERROR).show();
+                    }
+                });
+            }
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+
+                    String s=response.body().string();
+                    Log.d("shezhiactivity", "查询"+s);
+                    JsonObject jsonObject= GsonUtil.parse(s).getAsJsonObject();
+
+                    //登录成功,后续的连接操作因为cookies 原因,要用 MyApplication.okHttpClient
+                    int  jo=jsonObject.get("companyId").getAsInt();
+                    if (jo!=0){
+                        baoCunBean.setMoban(jo);
+                        baoCunBeanDao.update(baoCunBean);
+                    }
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                TastyToast.makeText(SheZhiActivity.this,"获取客户id成功",TastyToast.LENGTH_LONG,TastyToast.INFO).show();
+                            }
+                        });
+
+                }catch (final Exception e){
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            TastyToast.makeText(SheZhiActivity.this,"查询失败"+e.getMessage(),TastyToast.LENGTH_LONG,TastyToast.ERROR).show();
+                        }
+                    });
+                }
+            }
+
+        });
+
+    }
+
 
     //首先登录-->获取所有主机-->创建或者删除或者更新门禁
     private void getOkHttpClient2(String userName,String pwd,String url){
@@ -970,7 +1040,7 @@ public class SheZhiActivity extends Activity implements View.OnClickListener, Vi
                     runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            TastyToast.makeText(SheZhiActivity.this,"获取Screen_token成功",TastyToast.LENGTH_LONG,TastyToast.ERROR).show();
+                            TastyToast.makeText(SheZhiActivity.this,"获取Screen_token成功",TastyToast.LENGTH_LONG,TastyToast.INFO).show();
                         }
                     });
                 }
