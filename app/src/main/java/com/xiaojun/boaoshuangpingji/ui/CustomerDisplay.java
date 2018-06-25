@@ -527,8 +527,12 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
     @Subscribe(threadMode = ThreadMode.MAIN) //在ui线程执行
     public void onDataSynEvent(String event) {
         Log.d("CustomerDisplay", event+"ttttttttttttttttttttttt");
+        if (event.equals("msr")|| event.equals("xinxi")){
             isMsr=true;
             isYG=true;
+        }else if (event.equals("msr2")){
+            isMsr=true;
+        }
 
 
     }

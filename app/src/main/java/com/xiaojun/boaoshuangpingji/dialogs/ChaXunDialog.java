@@ -2,6 +2,7 @@ package com.xiaojun.boaoshuangpingji.dialogs;
 
 import android.app.Dialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.os.Handler;
 import android.os.Message;
 import android.text.Editable;
@@ -18,22 +19,27 @@ import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageView;
+
 import android.widget.ListView;
 import android.widget.TextView;
 
+
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+
 import com.sdsmdg.tastytoast.TastyToast;
 import com.xiaojun.boaoshuangpingji.MyApplication;
 import com.xiaojun.boaoshuangpingji.R;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunBean;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunBeanDao;
+import com.xiaojun.boaoshuangpingji.beans.BitmapsBean;
 import com.xiaojun.boaoshuangpingji.beans.NameBean;
 import com.xiaojun.boaoshuangpingji.cookies.CookiesManager;
-import com.xiaojun.boaoshuangpingji.ui.DetecterActivity;
 import com.xiaojun.boaoshuangpingji.utils.GsonUtil;
 import com.yatoooon.screenadaptation.ScreenAdapterTools;
+import org.greenrobot.eventbus.EventBus;
+import org.greenrobot.eventbus.Subscribe;
+import org.greenrobot.eventbus.ThreadMode;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -66,11 +72,13 @@ public class ChaXunDialog extends Dialog  {
     private BaoCunBeanDao baoCunBeanDao= MyApplication.myApplication.getDaoSession().getBaoCunBeanDao();
     private BaoCunBean baoCunBean=null;
     private PopupWindowAdapter3 adapter3=null;
+    private XinXiDialog chaxunchuDialog=null;
+    private XinXiDialog baomingDialog=null;
+    private BitmapsBean bitmapsBean=null;
 
-
-
-    public ChaXunDialog(Context context) {
+    public ChaXunDialog(Context context,BitmapsBean bitmapsBean) {
         super(context, R.style.dialog_style2);
+        this.bitmapsBean=bitmapsBean;
         Window window =  this.getWindow();
         if ( window != null) {
             WindowManager.LayoutParams attr = window.getAttributes();
@@ -85,10 +93,41 @@ public class ChaXunDialog extends Dialog  {
         setCustomDialog();
     }
 
+    public void updataTuPian(BitmapsBean event){
+        //更新图片
+        if (chaxunchuDialog!=null){
+            chaxunchuDialog.updataTuPian(event);
+        }
+        if (baomingDialog!=null){
+            baomingDialog.updataTuPian(event);
+        }
+
+
+    }
+
     private void setCustomDialog() {
         View mView = LayoutInflater.from(getContext()).inflate(R.layout.chaxunitem, null);
         ScreenAdapterTools.getInstance().loadView(mView);
+        EventBus.getDefault().register(ChaXunDialog.this);//订阅
         tijiao=mView.findViewById(R.id.baoming);
+        tijiao.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //报名
+                baomingDialog=new XinXiDialog(context,2,null,null);
+                if (bitmapsBean!=null)
+                baomingDialog.updataTuPian(bitmapsBean);
+                baomingDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        baomingDialog=null;
+                        Log.d("DetecterActivity", "关闭报名的信息弹窗");
+                    }
+                });
+                baomingDialog.show();
+
+            }
+        });
         guanbi=mView.findViewById(R.id.guanbi);
         guanbi.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -124,13 +163,21 @@ public class ChaXunDialog extends Dialog  {
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                XinXiDialog dialog=new XinXiDialog(context);
-                dialog.show();
+                chaxunchuDialog=new XinXiDialog(context,1,null,stringList.get(position));
+                chaxunchuDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+                    @Override
+                    public void onDismiss(DialogInterface dialog) {
+                        chaxunchuDialog=null;
+                        Log.d("DetecterActivity", "关闭查询的信息弹窗");
+                    }
+                });
+                chaxunchuDialog.show();
 
             }
         });
         adapter3=new PopupWindowAdapter3(context,stringList);
         listView.setAdapter(adapter3);
+
 
 
         super.setContentView(mView);
@@ -152,12 +199,12 @@ public class ChaXunDialog extends Dialog  {
 
     /**
      * 确定键监听器
-     * @param listener
+     * @param
      */
 
-    public void setOnQueRenListener(View.OnClickListener listener){
-        tijiao.setOnClickListener(listener);
-    }
+//    public void setOnQueRenListener(View.OnClickListener listener){
+//        tijiao.setOnClickListener(listener);
+//    }
 
 
     public class PopupWindowAdapter3 extends BaseAdapter {
@@ -223,7 +270,14 @@ public class ChaXunDialog extends Dialog  {
         }
     }
 
+    @Subscribe(threadMode = ThreadMode.MAIN) //在ui线程执行
+    public void onDataSynEvent(String event) {
+        //关闭 的广播
+        if (event.equals("guanbi")){
+            ChaXunDialog.this.dismiss();
+        }
 
+    }
 
     private void chaxun(CharSequence s) {
         Log.d("ChaXunDialog", s.toString()+"yyyyyyyy");
@@ -304,6 +358,7 @@ public class ChaXunDialog extends Dialog  {
                 if (stringList.size()>0)
                     stringList.clear();
                 adapter3.notifyDataSetChanged();
+                TastyToast.makeText(context, "没有搜索到", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
             }
 
 

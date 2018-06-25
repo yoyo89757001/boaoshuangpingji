@@ -180,6 +180,33 @@ public class NameBean {
         private int status;
         private int subject_type;
         private String title;
+        private String interviewee;
+        private String roomNumber;
+        private String industry;
+
+        public String getIndustry() {
+            return industry;
+        }
+
+        public void setIndustry(String industry) {
+            this.industry = industry;
+        }
+
+        public String getRoomNumber() {
+            return roomNumber;
+        }
+
+        public void setRoomNumber(String roomNumber) {
+            this.roomNumber = roomNumber;
+        }
+
+        public String getInterviewee() {
+            return interviewee;
+        }
+
+        public void setInterviewee(String interviewee) {
+            this.interviewee = interviewee;
+        }
 
         public int getAccountId() {
             return accountId;

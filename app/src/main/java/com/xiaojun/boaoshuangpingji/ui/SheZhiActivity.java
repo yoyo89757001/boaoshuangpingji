@@ -963,6 +963,7 @@ public class SheZhiActivity extends Activity implements View.OnClickListener, Vi
                     int  jo=jsonObject.get("companyId").getAsInt();
                     if (jo!=0){
                         baoCunBean.setMoban(jo);
+                        baoCunBean.setZhanhuiBianMa(jsonObject.get("streamingNo").getAsString());
                         baoCunBeanDao.update(baoCunBean);
                     }
 
