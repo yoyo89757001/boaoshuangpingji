@@ -70,6 +70,7 @@ import com.xiaojun.boaoshuangpingji.R;
 
 import com.xiaojun.boaoshuangpingji.beans.BaoCunBean;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunBeanDao;
+import com.xiaojun.boaoshuangpingji.beans.BaoCunIdDao;
 import com.xiaojun.boaoshuangpingji.beans.BitmapsBean;
 import com.xiaojun.boaoshuangpingji.beans.MenBean;
 import com.xiaojun.boaoshuangpingji.cookies.CookiesManager;
@@ -164,6 +165,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
     private HorizontalScrollView scrollView;
     private BaoCunBeanDao baoCunBeanDao=MyApplication.myApplication.getDaoSession().getBaoCunBeanDao();
     private BaoCunBean baoCunBean=null;
+    private BaoCunIdDao baoCunIdDao=MyApplication.myApplication.getDaoSession().getBaoCunIdDao();
 
 
 
@@ -192,12 +194,31 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
             }
 
             if (msg.arg1==1) {
-                MenBean dataBean = (MenBean) msg.obj;
+                final MenBean dataBean = (MenBean) msg.obj;
                 try {
 
                     switch (dataBean.getPerson().getTag().getSubject_type()) {
                         case 0: //员工
                             //Log.d(TAG, "员工k");
+
+                            //推送到主屏 签到
+                            if (isYG){
+                                isMsr=false;
+                                isYG=false;
+                                new Thread(new Runnable() {
+                                    @Override
+                                    public void run() {
+                                        try {
+                                            if (baoCunBeanDao.load(Long.valueOf(dataBean.getPerson().getTag().getJob_number()))==null)
+                                                EventBus.getDefault().post(dataBean);
+                                        }catch (Exception e){
+                                            Log.d("CustomerDisplay", e.getMessage()+"查询本地保存ID异常");
+                                        }
+
+                                    }
+                                }).start();
+
+                            }
                             int a = 0;
                             for (int i2 = 0; i2 < menBeansList.size(); i2++) {
                                 if (Objects.equals(menBeansList.get(i2).getPerson().getTag().getId(), dataBean.getPerson().getTag().getId())) {
@@ -206,12 +227,6 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                             }
 
                             if (a == 0) {
-                                //推送到主屏 签到
-                                if (isYG){
-                                    isMsr=false;
-                                    isYG=false;
-                                    EventBus.getDefault().post(dataBean);
-                                }
                                 menBeansList.add(dataBean);
                                // int i1 = menBeansList.size();
                                 final View view3 = View.inflate(mContext, R.layout.tanchuang_item213, null);

@@ -37,7 +37,7 @@
                             android:layout_height="140px">
 
                                 <ImageView
-                                    android:background="@color/colorPrimaryDark"
+                                    android:scaleType="fitXY"
                                     android:id="@+id/touxiang"
                                     android:layout_width="match_parent"
                                     android:layout_height="match_parent" />

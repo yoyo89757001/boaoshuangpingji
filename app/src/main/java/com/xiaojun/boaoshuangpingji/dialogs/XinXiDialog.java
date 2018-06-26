@@ -26,6 +26,7 @@ import com.xiaojun.boaoshuangpingji.R;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunBean;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunBeanDao;
 import com.xiaojun.boaoshuangpingji.beans.BitmapsBean;
+import com.xiaojun.boaoshuangpingji.beans.ChaXunBeans;
 import com.xiaojun.boaoshuangpingji.beans.MenBean;
 import com.xiaojun.boaoshuangpingji.beans.NameBean;
 import com.xiaojun.boaoshuangpingji.cookies.CookiesManager;
@@ -145,17 +146,26 @@ public class XinXiDialog extends Dialog {
                 //提交 2 是报名  0 是识别出来的   1 是查询出来的
                 switch (type){
                     case 0:{
+                        if (menBean.getPerson().getTag().getJob_number()!=null && !menBean.getPerson().getTag().getJob_number().equals(""))
+                           qiandao(menBean.getPerson().getTag().getJob_number());
 
                     }
                         break;
                     case 1:{
 
+                        if (!name.getText().toString().trim().equals("")
+                                && zhaopianPath!=null && !renyuanleixing.getText().toString().trim().equals("") ){
+                            xiugai();
+                        }else {
+                            TastyToast.makeText(context, "请先填写完整信息和照片", TastyToast.LENGTH_LONG, TastyToast.INFO).show();
+                        }
                     }
                     break;
 
                     case 2:{
-                        if (!name.getText().toString().trim().equals("") && zhaopianPath!=null){
-                            baoming(null);
+                        if (!name.getText().toString().trim().equals("")
+                                && zhaopianPath!=null && !renyuanleixing.getText().toString().trim().equals("")){
+                            baoming();
                         }else {
                             TastyToast.makeText(context, "请先填写完整信息和照片", TastyToast.LENGTH_LONG, TastyToast.INFO).show();
                         }
@@ -163,8 +173,6 @@ public class XinXiDialog extends Dialog {
                     break;
 
                 }
-
-
 
             }
         });
@@ -186,7 +194,17 @@ public class XinXiDialog extends Dialog {
             case 0:
                 //识别
                 chongpai.setVisibility(View.GONE);
-
+                if (menBean.getPerson().getTag().getJob_number()!=null && !menBean.getPerson().getTag().getJob_number().equals(""))
+                chaxunOne(menBean.getPerson().getTag().getJob_number());
+                if (menBean!=null && menBean.getPerson()!=null && menBean.getPerson().getTag().getAvatar()!=null)
+                Glide.with(context)
+                        //	.load(R.drawable.vvv)
+                        .load(baoCunBean.getHoutaidizhi_ks() + menBean.getPerson().getTag().getAvatar())
+                        .error(R.drawable.erroy_bg)
+                        //.apply(myOptions)
+                        .transform(new GlideRoundTransform(MyApplication.getAppContext(), 20))
+                        //.transform(new GlideCircleTransform(MyApplication.getAppContext(),2, Color.parseColor("#ffffffff")))
+                        .into(touxiang);
 
                 break;
             case 1://查询出来
@@ -200,6 +218,8 @@ public class XinXiDialog extends Dialog {
                         .transform(new GlideRoundTransform(MyApplication.getAppContext(), 20))
                         //.transform(new GlideCircleTransform(MyApplication.getAppContext(),2, Color.parseColor("#ffffffff")))
                         .into(touxiang);
+                if (objectsBean.getPhoto_ids()!=null && !objectsBean.getPhoto_ids().equals(""))
+                zhaopianPath=objectsBean.getPhoto_ids();
                 name.setText(objectsBean.getName());
                 xingbie.setText(objectsBean.getSexs());
                 renyuanleixing.setText(objectsBean.getDepartment());
@@ -403,7 +423,7 @@ public class XinXiDialog extends Dialog {
         tijiao.setOnClickListener(listener);
     }
 
-    private void baoming(String id) {
+    private void baoming() {
         OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
                 .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
@@ -411,34 +431,8 @@ public class XinXiDialog extends Dialog {
                 .cookieJar(new CookiesManager())
                 .retryOnConnectionFailure(true)
                 .build();
-        Log.d("XinXiDialog", baoCunBean.getZhanhuiBianMa()+"展会编码    ");
 
-        RequestBody body=null;
-        if (id!=null) {
-            body = new FormBody.Builder()
-                    .add("id",id)
-                    .add("name", name.getText().toString().trim()) //姓名
-                    .add("location", zuoweihao.getText().toString().trim()) //座位号
-                    .add("companyName", baoCunBean.getMoban() + "") //客户id
-                    .add("assemblyId", baoCunBean.getZhanhuiBianMa() == null ? "" : baoCunBean.getZhanhuiBianMa()) //展会编码
-                    .add("sexs", xingbie.getText().toString().trim()) //性别
-                    .add("contact", lianxiren.getText().toString().trim()) //联系人
-                    .add("department", renyuanleixing.getText().toString().trim()) //人员类型（部门）
-                    .add("title", zhiweizhiwu.getText().toString().trim()) //手机号
-                    .add("come_from", gongsimingcheng.getText().toString().trim()) //公司名称
-                    .add("interviewee", gongsidizhi.getText().toString().trim()) //公司地址
-                    .add("contactWay", lianxifangshi.getText().toString().trim()) //手机号
-                    .add("roomType", fangjianleixing.getText().toString().trim()) //房间类型
-                    .add("roomNumber", fangjianhao.getText().toString().trim()) //房间号
-                    .add("industry", hangyeleixing.getText().toString().trim()) //行业类型
-                    .add("phone", shoujihaoma.getText().toString().trim()) //手机号
-//                .add("phone", shoujihaoma.getText().toString().trim()) //手机号
-//                .add("phone", shoujihaoma.getText().toString().trim()) //手机号
-//                .add("phone", shoujihaoma.getText().toString().trim()) //手机号
-                    .add("photo_ids", zhaopianPath)
-                    .build();
-        }else {
-            body = new FormBody.Builder()
+        RequestBody body = new FormBody.Builder()
                     .add("name", name.getText().toString().trim()) //姓名
                     .add("location", zuoweihao.getText().toString().trim()) //座位号
                     .add("companyName", baoCunBean.getMoban() + "") //客户id
@@ -460,7 +454,6 @@ public class XinXiDialog extends Dialog {
                     .add("photo_ids", zhaopianPath)
                     .build();
 
-        }
 
         Request.Builder requestBuilder = new Request.Builder();
         // requestBuilder.header("User-Agent", "Koala Admin");
@@ -489,6 +482,75 @@ public class XinXiDialog extends Dialog {
                 } catch (Exception e) {
 
                     Log.d("DetecterActivity", e.getMessage() + "保存异常");
+                }
+
+            }
+        });
+
+    }
+
+    //修改
+    private void xiugai() {
+        OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                .cookieJar(new CookiesManager())
+                .retryOnConnectionFailure(true)
+                .build();
+        Log.d("XinXiDialog", baoCunBean.getZhanhuiBianMa()+"展会编码    ");
+
+                RequestBody body = new FormBody.Builder()
+                    .add("id",objectsBean.getId()+"")
+                    .add("name", name.getText().toString().trim()) //姓名
+                    .add("location", zuoweihao.getText().toString().trim()) //座位号
+                    .add("companyName", objectsBean.getCompanyName()) //客户id
+                    .add("assemblyId", objectsBean.getAssemblyId()) //展会编码
+                    .add("sexs", xingbie.getText().toString().trim()) //性别
+                    .add("contact", lianxiren.getText().toString().trim()) //联系人
+                    .add("department", renyuanleixing.getText().toString().trim()) //人员类型（部门）
+                    .add("title", zhiweizhiwu.getText().toString().trim()) //手机号
+                    .add("come_from", gongsimingcheng.getText().toString().trim()) //公司名称
+                    .add("interviewee", gongsidizhi.getText().toString().trim()) //公司地址
+                    .add("contactWay", lianxifangshi.getText().toString().trim()) //手机号
+                    .add("roomType", fangjianleixing.getText().toString().trim()) //房间类型
+                    .add("roomNumber", fangjianhao.getText().toString().trim()) //房间号
+                    .add("industry", hangyeleixing.getText().toString().trim()) //行业类型
+                    .add("phone", shoujihaoma.getText().toString().trim()) //手机号
+                    .add("channel", objectsBean.getChannel()+"") //来源
+                     .add("jobStatus", objectsBean.getJobStatus()+"") //手机号
+                    .add("subject_type", objectsBean.getSubject_type()+"") //手机号
+                    .add("photo_ids", zhaopianPath)
+                    .build();
+
+
+        Request.Builder requestBuilder = new Request.Builder();
+        // requestBuilder.header("User-Agent", "Koala Admin");
+        requestBuilder.header("Content-Type", "application/json");
+        requestBuilder.post(body);
+        requestBuilder.url(baoCunBean.getHoutaiDiZhi() + "/savePeople.do");
+        //Log.d("DetecterActivity", baoCunBean.getHoutaiDiZhi()+"地址");
+        // Log.d("DetecterActivity", baoCunBean.getZhanhuiId()+"展会id");
+        final Request request = requestBuilder.build();
+
+        final Call mcall = okHttpClient.newCall(request);
+        mcall.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+                Log.d("ghhghghh", "修改失败" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    String s = response.body().string();
+                    Log.d("ghhghghh", "修改" + s);
+                    JsonObject jsonObject = GsonUtil.parse(s).getAsJsonObject();
+                    qiandao(jsonObject.get("sid").getAsInt()+"");
+
+                } catch (Exception e) {
+
+                    Log.d("DetecterActivity", e.getMessage() + "修改异常");
                 }
 
             }
@@ -681,6 +743,12 @@ public class XinXiDialog extends Dialog {
                 .add("roomType", fangjianleixing.getText().toString().trim()) //房间类型
                 .add("roomNumber", fangjianhao.getText().toString().trim()) //房间号
                 .add("industry", hangyeleixing.getText().toString().trim()) //行业类型
+                .add("industry", hangyeleixing.getText().toString().trim()) //行业类型
+                .add("channel", objectsBean.getChannel()+"") //来源
+                .add("jobStatus", objectsBean.getJobStatus()+"") //手机号
+                .add("subject_type", objectsBean.getSubject_type()+"") //手机号
+                .add("photo_ids", zhaopianPath==null?"":zhaopianPath)
+                .add("phone", shoujihaoma.getText().toString().trim()) //手机号
                 .build();
 
         Request.Builder requestBuilder = new Request.Builder();
@@ -743,6 +811,115 @@ public class XinXiDialog extends Dialog {
                         @Override
                         public void run() {
                             TastyToast.makeText(context, "签到异常", TastyToast.LENGTH_LONG, TastyToast.INFO).show();
+
+                        }
+                    }, 0);
+                    Log.d("DetecterActivity", e.getMessage() + "");
+                }
+
+            }
+        });
+
+    }
+
+
+    //查询单个
+    private void chaxunOne(String id) {
+        final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                .cookieJar(new CookiesManager())
+                .retryOnConnectionFailure(true)
+                .build();
+
+        RequestBody body = new FormBody.Builder()
+                .add("id", id)
+                .build();
+
+        Request.Builder requestBuilder = new Request.Builder();
+        // requestBuilder.header("User-Agent", "Koala Admin");
+        requestBuilder.header("Content-Type", "application/json");
+        requestBuilder.post(body);
+        requestBuilder.url(baoCunBean.getHoutaiDiZhi() + "/getAppSubject.do");
+        //Log.d("DetecterActivity", baoCunBean.getHoutaiDiZhi()+"地址");
+        // Log.d("DetecterActivity", baoCunBean.getZhanhuiId()+"展会id");
+        final Request request = requestBuilder.build();
+
+        Call mcall = okHttpClient.newCall(request);
+        mcall.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+                Log.d("gghhhh", "查询单个失败" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    String s = response.body().string();
+                    Log.d("xinxi", "查询单个人" + s);
+                    JsonObject jsonObject = GsonUtil.parse(s).getAsJsonObject();
+                    Gson gson=new Gson();
+                    final ChaXunBeans nameBean=gson.fromJson(jsonObject,ChaXunBeans.class);
+
+                        mHandler.postDelayed(new Runnable() {
+
+                            @Override
+                            public void run() {
+                            // 设置信息
+                                objectsBean=null;
+                                objectsBean=new NameBean.ObjectsBean();
+                               objectsBean.setAssemblyId(nameBean.getAssemblyId());
+                                objectsBean.setChannel(nameBean.getChannel());
+                                objectsBean.setCome_from(nameBean.getCome_from());
+                                objectsBean.setCompanyName(nameBean.getCompanyName());
+                                objectsBean.setContact(nameBean.getContact());
+                                objectsBean.setContactWay(nameBean.getContactWay());
+                                objectsBean.setDepartment(nameBean.getDepartment());
+                                objectsBean.setId(nameBean.getId());
+                                objectsBean.setIndustry(nameBean.getIndustry());
+                                objectsBean.setInterviewee(nameBean.getInterviewee());
+                                objectsBean.setJobStatus(nameBean.getJobStatus());
+                                objectsBean.setLocation(nameBean.getLocation());
+                                objectsBean.setMeetingId(nameBean.getMeetingId());
+                                objectsBean.setName(nameBean.getName());
+                                objectsBean.setPhoto_ids(nameBean.getPhoto_ids());
+                                objectsBean.setRoomNumber(nameBean.getRoomNumber());
+                                objectsBean.setRoomType(nameBean.getRoomType());
+                                objectsBean.setPhone(nameBean.getPhone());
+                                objectsBean.setSexs(nameBean.getSexs());
+                                objectsBean.setSubject_type(nameBean.getSubject_type());
+                                objectsBean.setTitle(nameBean.getTitle());
+                                objectsBean.setStatus(nameBean.getStatus());
+
+                                ////////////////////////////////////
+
+                                if (objectsBean.getPhoto_ids()!=null && !objectsBean.getPhoto_ids().equals(""))
+                                    zhaopianPath=objectsBean.getPhoto_ids();
+                                name.setText(objectsBean.getName());
+                                xingbie.setText(objectsBean.getSexs());
+                                renyuanleixing.setText(objectsBean.getDepartment());
+                                shoujihaoma.setText(objectsBean.getPhone());
+                                zhiweizhiwu.setText(objectsBean.getTitle());
+                                gongsimingcheng.setText(objectsBean.getCome_from());
+                                gongsidizhi.setText(objectsBean.getInterviewee());
+                                lianxiren.setText(objectsBean.getContact());
+                                lianxifangshi.setText(objectsBean.getContactWay());
+                                fangjianleixing.setText(objectsBean.getRoomType());
+                                fangjianhao.setText(objectsBean.getRoomNumber());
+                                zuoweihao.setText(objectsBean.getLocation());
+                                hangyeleixing.setText(objectsBean.getIdentity());
+
+                            }
+                        }, 0);
+
+                } catch (Exception e) {
+                    mHandler.postDelayed(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            TastyToast.makeText(context, "查询个人信息异常", TastyToast.LENGTH_LONG, TastyToast.INFO).show();
 
                         }
                     }, 0);
