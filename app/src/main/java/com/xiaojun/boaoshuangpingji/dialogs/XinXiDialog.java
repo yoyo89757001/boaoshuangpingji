@@ -1244,11 +1244,12 @@ public class XinXiDialog extends Dialog {
                             // 设置信息
                             if (zhanhuiLists.size()>0)
                                 zhanhuiLists.clear();
-
-
-                            zhanhuiLists.addAll(nameBean.getObjects());
-                            zhanHuiAdapter.notifyDataSetChanged();
-
+                            try {
+                                zhanhuiLists.addAll(nameBean.getObjects());
+                                zhanHuiAdapter.notifyDataSetChanged();
+                            }catch (Exception e){
+                                Log.d("XinXiDialog", e.getMessage()+"");
+                            }
 
                         }
                     }, 0);

@@ -18,7 +18,7 @@
                 <LinearLayout
                     android:orientation="vertical"
                     android:layout_marginTop="200px"
-                    android:layout_marginLeft="120px"
+                    android:layout_marginLeft="180px"
                     android:layout_marginRight="250px"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content">
@@ -67,8 +67,8 @@
                 android:layout_alignParentRight="true"
                 android:layout_width="230px"
                 android:id="@+id/touxiang"
-                android:layout_marginRight="190px"
-                android:layout_marginTop="360px"
+                android:layout_marginRight="200px"
+                android:layout_marginTop="350px"
                 android:scaleType="fitXY"
                 android:layout_height="260px" />
 
