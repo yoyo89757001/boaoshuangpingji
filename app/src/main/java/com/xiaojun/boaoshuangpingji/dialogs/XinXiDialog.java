@@ -196,7 +196,8 @@ public class XinXiDialog extends Dialog {
 
                         if (!name.getText().toString().trim().equals("")
                                 && zhaopianPath != null
-                                && !renyuanleixing.getText().toString().trim().equals("")) {
+                                && !renyuanleixing.getText().toString().trim().equals("")
+                                && !shoujihaoma.getText().toString().trim().equals("")) {
 
                                xiugai();
 
@@ -210,7 +211,8 @@ public class XinXiDialog extends Dialog {
                         Log.d("XinXiDialog", zhaopianPath+"照片地址");
                         if (!name.getText().toString().trim().equals("")
                                 && zhaopianPath != null
-                                && !renyuanleixing.getText().toString().trim().equals("")) {
+                                && !renyuanleixing.getText().toString().trim().equals("")
+                                && !shoujihaoma.getText().toString().trim().equals("")) {
                               baoming();
 
                         } else {
@@ -253,7 +255,8 @@ public class XinXiDialog extends Dialog {
 
                         if (!name.getText().toString().trim().equals("")
                                 && zhaopianPath != null
-                                && !renyuanleixing.getText().toString().trim().equals("")) {
+                                && !renyuanleixing.getText().toString().trim().equals("")
+                                && !shoujihaoma.getText().toString().trim().equals("")) {
                             l1.setVisibility(View.GONE);
                             l2.setVisibility(View.GONE);
                             tijiao.setVisibility(View.GONE);
@@ -273,7 +276,8 @@ public class XinXiDialog extends Dialog {
                         Log.d("XinXiDialog", zhaopianPath+"照片地址");
                         if (!name.getText().toString().trim().equals("")
                                 && zhaopianPath != null
-                                && !renyuanleixing.getText().toString().trim().equals("")) {
+                                && !renyuanleixing.getText().toString().trim().equals("")
+                                && !shoujihaoma.getText().toString().trim().equals("")) {
                             l1.setVisibility(View.GONE);
                             l2.setVisibility(View.GONE);
                             l3.setVisibility(View.VISIBLE);
