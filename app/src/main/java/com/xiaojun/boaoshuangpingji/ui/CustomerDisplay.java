@@ -243,24 +243,25 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                                // int i1 = menBeansList.size();
                                 final View view3 = View.inflate(mContext, R.layout.tanchuang_item213, null);
                                 ScreenAdapterTools.getInstance().loadView(view3);
-                                view3.setTag(dataBean.getPerson().getTag().getJob_number());
                                 TextView name3 = (TextView) view3.findViewById(R.id.name);
                                 ImageView touxiang = (ImageView) view3.findViewById(R.id.touxiang);
                                 name3.setText(dataBean.getPerson().getTag().getName()+"");
                                 TextView zhiwei = (TextView) view3.findViewById(R.id.zhiwei);
                                 zhiwei.setText(dataBean.getPerson().getTag().getDepartment()+"");
                                 TyperTextView huanyinyu = (TyperTextView) view3.findViewById(R.id.typerTextView);
+
+                                chaxunOne(dataBean.getPerson().getTag().getJob_number(),zhiwei,huanyinyu);
+
                                 huanyinyu.setTyperSpeed(100);
                                 huanyinyu.setCharIncrease(1);
-                                huanyinyu.setAnimationListener(new AnimationListener() {
-                                    @Override
-                                    public void onAnimationEnd(HTextView hTextView) {
-
-
-                                    }
-                                });
+//                                huanyinyu.setAnimationListener(new AnimationListener() {
+//                                    @Override
+//                                    public void onAnimationEnd(HTextView hTextView) {
+//
+//                                    }
+//                                });
                               //  huanyinyu.setText();
-                                huanyinyu.animateText(dataBean.getPerson().getTag().getTitle()+"");
+                               // huanyinyu.animateText(dataBean.getPerson().getTag().getTitle()+"");
 
                                 //huanyinyu.setText(hyy);
                                 //synthesizer.speak(hyy==null?"":hyy);
@@ -996,7 +997,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
 
 
     //查询单个
-    private void chaxunOne(String id) {
+    private void chaxunOne(String id, final TextView zhiwei, final TyperTextView huanyinyu) {
         final OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
                 .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
@@ -1040,8 +1041,8 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                         @Override
                         public void run() {
                             // 设置信息
-
-
+                        zhiwei.setText(nameBean.getDepartment());
+                        huanyinyu.animateText(nameBean.getCome_from());
 
                         }
                     }, 0);
