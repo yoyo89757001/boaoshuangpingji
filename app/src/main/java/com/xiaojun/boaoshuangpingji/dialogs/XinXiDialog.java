@@ -1197,7 +1197,7 @@ public class XinXiDialog extends Dialog {
 
     }
 
-    //查询单个
+    //查询分会议
     private void chaxunFHY() {
         final OkHttpClient okHttpClient = new OkHttpClient.Builder()
                 .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)

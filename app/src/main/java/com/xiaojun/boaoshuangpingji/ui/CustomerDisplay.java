@@ -65,6 +65,7 @@ import com.guo.android_extend.widget.CameraSurfaceView;
 import com.hanks.htextview.base.AnimationListener;
 import com.hanks.htextview.base.HTextView;
 import com.hanks.htextview.typer.TyperTextView;
+import com.sdsmdg.tastytoast.TastyToast;
 import com.xiaojun.boaoshuangpingji.MyApplication;
 import com.xiaojun.boaoshuangpingji.R;
 
@@ -72,7 +73,9 @@ import com.xiaojun.boaoshuangpingji.beans.BaoCunBean;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunBeanDao;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunIdDao;
 import com.xiaojun.boaoshuangpingji.beans.BitmapsBean;
+import com.xiaojun.boaoshuangpingji.beans.ChaXunBeans;
 import com.xiaojun.boaoshuangpingji.beans.MenBean;
+import com.xiaojun.boaoshuangpingji.beans.NameBean;
 import com.xiaojun.boaoshuangpingji.cookies.CookiesManager;
 import com.xiaojun.boaoshuangpingji.interfaces.RecytviewCash;
 import com.xiaojun.boaoshuangpingji.utils.FaceDB;
@@ -106,6 +109,7 @@ import java.util.concurrent.TimeUnit;
 import okhttp3.Call;
 import okhttp3.Callback;
 
+import okhttp3.FormBody;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
@@ -149,6 +153,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
     FRAbsLoop mFRAbsLoop = null;
    // AFT_FSDKFace mAFT_FSDKFace = null;
     Handler mHandler;
+    private final int TIMEOUT = 1000 * 30;
 
   //  private BlockingQueue<String> basket = new LinkedBlockingQueue<String>(5);
     private static Vector<MenBean> menBeansList=new Vector<>();
@@ -238,11 +243,12 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                                // int i1 = menBeansList.size();
                                 final View view3 = View.inflate(mContext, R.layout.tanchuang_item213, null);
                                 ScreenAdapterTools.getInstance().loadView(view3);
+                                view3.setTag(dataBean.getPerson().getTag().getJob_number());
                                 TextView name3 = (TextView) view3.findViewById(R.id.name);
                                 ImageView touxiang = (ImageView) view3.findViewById(R.id.touxiang);
-                                name3.setText("测试的");
+                                name3.setText(dataBean.getPerson().getTag().getName()+"");
                                 TextView zhiwei = (TextView) view3.findViewById(R.id.zhiwei);
-                                zhiwei.setText("职位");
+                                zhiwei.setText(dataBean.getPerson().getTag().getDepartment()+"");
                                 TyperTextView huanyinyu = (TyperTextView) view3.findViewById(R.id.typerTextView);
                                 huanyinyu.setTyperSpeed(100);
                                 huanyinyu.setCharIncrease(1);
@@ -254,7 +260,7 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                                     }
                                 });
                               //  huanyinyu.setText();
-                                huanyinyu.animateText("测试测试测试测试测试测试测试测试测试测试测试测试测试测试测试");
+                                huanyinyu.animateText(dataBean.getPerson().getTag().getTitle()+"");
 
                                 //huanyinyu.setText(hyy);
                                 //synthesizer.speak(hyy==null?"":hyy);
@@ -986,5 +992,67 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
 //        }
 //        //	recycleBitmap(bitmap);
 //        return file;
+    }
+
+
+    //查询单个
+    private void chaxunOne(String id) {
+        final OkHttpClient okHttpClient = new OkHttpClient.Builder()
+                .writeTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                .connectTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                .readTimeout(TIMEOUT, TimeUnit.MILLISECONDS)
+                .cookieJar(new CookiesManager())
+                .retryOnConnectionFailure(true)
+                .build();
+
+        RequestBody body = new FormBody.Builder()
+                .add("id", id)
+                .build();
+
+        Request.Builder requestBuilder = new Request.Builder();
+        // requestBuilder.header("User-Agent", "Koala Admin");
+        requestBuilder.header("Content-Type", "application/json");
+        requestBuilder.post(body);
+        requestBuilder.url(baoCunBean.getHoutaiDiZhi() + "/getAppSubject.do");
+        //Log.d("DetecterActivity", baoCunBean.getHoutaiDiZhi()+"地址");
+        // Log.d("DetecterActivity", baoCunBean.getZhanhuiId()+"展会id");
+        final Request request = requestBuilder.build();
+
+        Call mcall = okHttpClient.newCall(request);
+        mcall.enqueue(new Callback() {
+            @Override
+            public void onFailure(Call call, IOException e) {
+
+                Log.d("gghhhh", "查询单个失败" + e.getMessage());
+            }
+
+            @Override
+            public void onResponse(Call call, Response response) throws IOException {
+                try {
+                    String s = response.body().string();
+                    Log.d("xinxi", "查询单个人" + s);
+                    JsonObject jsonObject = GsonUtil.parse(s).getAsJsonObject();
+                    Gson gson = new Gson();
+                    final ChaXunBeans nameBean = gson.fromJson(jsonObject, ChaXunBeans.class);
+
+                    mHandler.postDelayed(new Runnable() {
+
+                        @Override
+                        public void run() {
+                            // 设置信息
+
+
+
+                        }
+                    }, 0);
+
+                } catch (Exception e) {
+
+                    Log.d("DetecterActivity", e.getMessage() + "");
+                }
+
+            }
+        });
+
     }
 }
