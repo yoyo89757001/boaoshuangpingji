@@ -120,6 +120,7 @@ public class DetecterActivity extends Activity {
                     Log.d("DetecterActivity", "关闭信息弹窗");
                 }
             });
+        if (!DetecterActivity.this.isFinishing() && !DetecterActivity.this.isDestroyed())
             xinXiDialog.show();
 
 
@@ -142,6 +143,7 @@ public class DetecterActivity extends Activity {
                     Log.d("DetecterActivity", "关闭陌生人弹窗");
                 }
             });
+            if (!DetecterActivity.this.isFinishing() && !DetecterActivity.this.isDestroyed())
             chaXunDialog.show();
         }else {
             //更新图片

@@ -209,9 +209,16 @@ public class CustomerDisplay extends Presentation implements CameraSurfaceView.O
                                     @Override
                                     public void run() {
                                         try {
-                                            if (baoCunBeanDao.load(Long.valueOf(dataBean.getPerson().getTag().getJob_number()))==null)
+                                            if (baoCunIdDao.load(Long.valueOf(dataBean.getPerson().getTag().getJob_number()))==null){
                                                 EventBus.getDefault().post(dataBean);
+                                            }else {
+                                                isYG=true;
+                                                isMsr=true;
+                                                Log.d("CustomerDisplay", "baoCunIdDao:" + baoCunIdDao.load(Long.valueOf(dataBean.getPerson().getTag().getJob_number())).getId());
+                                            }
+
                                         }catch (Exception e){
+                                            isYG=true;
                                             Log.d("CustomerDisplay", e.getMessage()+"查询本地保存ID异常");
                                         }
 

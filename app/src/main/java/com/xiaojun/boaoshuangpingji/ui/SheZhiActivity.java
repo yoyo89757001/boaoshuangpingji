@@ -29,6 +29,8 @@ import com.xiaojun.boaoshuangpingji.MyApplication;
 import com.xiaojun.boaoshuangpingji.R;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunBean;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunBeanDao;
+import com.xiaojun.boaoshuangpingji.beans.BaoCunId;
+import com.xiaojun.boaoshuangpingji.beans.BaoCunIdDao;
 import com.xiaojun.boaoshuangpingji.cookies.CookiesManager;
 import com.xiaojun.boaoshuangpingji.dialogs.XiuGaiHouTaiDialog;
 import com.xiaojun.boaoshuangpingji.dialogs.XiuGaiHouTaiDialog2;
@@ -75,8 +77,7 @@ public class SheZhiActivity extends Activity implements View.OnClickListener, Vi
     private BaoCunBean baoCunBean=null;
     private int dw,dh;
     public  OkHttpClient okHttpClient=null;
-    private static String usbPath=null;
-    private StringBuilder stringBuilder=new StringBuilder();
+    private BaoCunIdDao baoCunIdDao=MyApplication.myApplication.getDaoSession().getBaoCunIdDao();
 
 
 
@@ -438,8 +439,10 @@ public class SheZhiActivity extends Activity implements View.OnClickListener, Vi
                                 baoCunBeanDao.update(baoCunBean);
                                 baoCunBean=baoCunBeanDao.load(123456L);
                                 try {
-
+                                    //修改会议id的时候 删掉保存在本地的人
+                                    baoCunIdDao.deleteAll();
                                     getOkHttpClient(baoCunBean.getZhanhuiId());
+
 
                                 }catch (Exception e){
                                     Log.d("SheZhiActivity", e.getMessage());

@@ -124,6 +124,7 @@ public class ChaXunDialog extends Dialog  {
                         Log.d("DetecterActivity", "关闭报名的信息弹窗");
                     }
                 });
+
                 baomingDialog.show();
 
             }
