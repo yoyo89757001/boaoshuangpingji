@@ -265,9 +265,9 @@ public class XinXiDialog extends Dialog {
                 //提交 2 是报名  0 是识别出来的   1 是查询出来的
                 switch (type) {
                     case 0: {
+
                         if (menBean.getPerson().getTag().getJob_number() != null && !menBean.getPerson().getTag().getJob_number().equals(""))
                             qiandao(menBean.getPerson().getTag().getJob_number());
-
                     }
                     break;
                     case 1: {
@@ -405,7 +405,7 @@ public class XinXiDialog extends Dialog {
                     }
                 });
                 listView.setAdapter(adapterss2);
-                popupWindow2 = new PopupWindow(contentView, 200, setListViewHeightBasedOnChildren(listView)>100?100:setListViewHeightBasedOnChildren(listView));
+                popupWindow2 = new PopupWindow(contentView, 200, setListViewHeightBasedOnChildren(listView)>104?104:setListViewHeightBasedOnChildren(listView));
                 popupWindow2.setFocusable(true);//获取焦点
                 popupWindow2.setOutsideTouchable(true);//获取外部触摸事件
                 popupWindow2.setTouchable(true);//能够响应触摸事件
@@ -417,24 +417,30 @@ public class XinXiDialog extends Dialog {
         renyuanleixing.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                View contentView = LayoutInflater.from(context).inflate(R.layout.xiangmu_po_item, null);
+                if (stringList.size()>0){
+                    View contentView = LayoutInflater.from(context).inflate(R.layout.xiangmu_po_item, null);
 
-                ListView listView = (ListView) contentView.findViewById(R.id.dddddd);
-                adapterss = new PopupWindowAdapter(context, stringList);
-                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                        renyuanleixing.setText(stringList.get(position));
-                        popupWindow.dismiss();
-                    }
-                });
-                listView.setAdapter(adapterss);
-                popupWindow = new PopupWindow(contentView, 200, setListViewHeightBasedOnChildren(listView)>230?230:setListViewHeightBasedOnChildren(listView));
-                popupWindow.setFocusable(true);//获取焦点
-                popupWindow.setOutsideTouchable(true);//获取外部触摸事件
-                popupWindow.setTouchable(true);//能够响应触摸事件
-                popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));//设置背景
-                popupWindow.showAsDropDown(renyuanleixing, 0, 1);
+                    ListView listView = (ListView) contentView.findViewById(R.id.dddddd);
+                    adapterss = new PopupWindowAdapter(context, stringList);
+                    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            renyuanleixing.setText(stringList.get(position));
+                            popupWindow.dismiss();
+                        }
+                    });
+                    listView.setAdapter(adapterss);
+                    popupWindow = new PopupWindow(contentView, 200, setListViewHeightBasedOnChildren(listView)>230?230:setListViewHeightBasedOnChildren(listView));
+                    popupWindow.setFocusable(true);//获取焦点
+                    popupWindow.setOutsideTouchable(true);//获取外部触摸事件
+                    popupWindow.setTouchable(true);//能够响应触摸事件
+                    popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));//设置背景
+                    popupWindow.showAsDropDown(renyuanleixing, 0, 1);
+                }else {
+                    TastyToast.makeText(context, "没有获取到人员类型数据", TastyToast.LENGTH_LONG, TastyToast.INFO).show();
+
+                }
+
 
 
             }
