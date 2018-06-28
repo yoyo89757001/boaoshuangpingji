@@ -33,23 +33,41 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content" />
 
-        <EditText
-            android:textColor="@color/blake"
-            android:textSize="24px"
-            android:layout_gravity="center_horizontal"
-            android:background="@drawable/zhongkong"
+        <RelativeLayout
             android:layout_marginLeft="80px"
             android:layout_marginTop="20px"
-            android:id="@+id/editview"
             android:layout_marginRight="80px"
-            android:paddingLeft="20px"
-            android:paddingRight="10px"
-            android:gravity="center_vertical"
-            android:drawableLeft="@drawable/sousuo"
-            android:hint="姓名/电话"
-            android:textColorHint="@color/textcolor2"
             android:layout_width="match_parent"
-            android:layout_height="70px" />
+            android:layout_height="70px">
+
+            <EditText
+                android:textColor="@color/blake"
+                android:textSize="24px"
+                android:layout_gravity="center_horizontal"
+                android:background="@drawable/zhongkong"
+                android:id="@+id/editview"
+                android:paddingLeft="20px"
+                android:paddingRight="10px"
+                android:gravity="center_vertical"
+                android:drawableLeft="@drawable/sousuo"
+                android:hint="姓名/电话"
+                android:textColorHint="@color/textcolor2"
+                android:layout_width="match_parent"
+                android:layout_height="70px" />
+
+            <ProgressBar
+                android:layout_alignParentRight="true"
+                android:layout_centerVertical="true"
+                android:layout_marginRight="10px"
+                style="@style/Widget.AppCompat.ProgressBar"
+                android:id="@+id/progressBar"
+                android:visibility="gone"
+                android:layout_width="40px"
+                android:layout_height="40px" />
+
+        </RelativeLayout>
+
+
 
 
         <ListView

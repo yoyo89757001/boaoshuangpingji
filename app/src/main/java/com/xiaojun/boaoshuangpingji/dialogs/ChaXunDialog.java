@@ -21,6 +21,7 @@ import android.widget.Button;
 import android.widget.EditText;
 
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 
@@ -75,6 +76,7 @@ public class ChaXunDialog extends Dialog  {
     private XinXiDialog chaxunchuDialog=null;
     private XinXiDialog baomingDialog=null;
     private BitmapsBean bitmapsBean=null;
+    private ProgressBar progressBar;
 
     public ChaXunDialog(Context context,BitmapsBean bitmapsBean) {
         super(context, R.style.dialog_style2);
@@ -109,6 +111,7 @@ public class ChaXunDialog extends Dialog  {
         View mView = LayoutInflater.from(getContext()).inflate(R.layout.chaxunitem, null);
         ScreenAdapterTools.getInstance().loadView(mView);
         EventBus.getDefault().register(ChaXunDialog.this);//订阅
+        progressBar=mView.findViewById(R.id.progressBar);
         tijiao=mView.findViewById(R.id.baoming);
         tijiao.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -150,12 +153,15 @@ public class ChaXunDialog extends Dialog  {
 
             @Override
             public void afterTextChanged(Editable s) {
-                if (!s.toString().equals(""))
+                if (!s.toString().equals("")){
                     chaxun(s);
+                    progressBar.setVisibility(View.VISIBLE);
+                }
                 else {
                     if (stringList.size()>0)
                         stringList.clear();
                     adapter3.notifyDataSetChanged();
+                    progressBar.setVisibility(View.GONE);
 
                 }
             }
@@ -313,6 +319,9 @@ public class ChaXunDialog extends Dialog  {
             @Override
             public void onFailure(Call call, IOException e)
             {
+                Message message=Message.obtain();
+                message.what=5;
+                handler.sendMessage(message);
                 Log.d("ghhghghh", "查询失败" + e.getMessage());
             }
 
@@ -336,7 +345,9 @@ public class ChaXunDialog extends Dialog  {
                     }
 
                 }catch (Exception e){
-
+                    Message message=Message.obtain();
+                    message.what=5;
+                    handler.sendMessage(message);
                     Log.d("DetecterActivity", e.getMessage()+"查询异常");
                 }
 
@@ -349,6 +360,7 @@ public class ChaXunDialog extends Dialog  {
         @Override
         public boolean handleMessage(Message msg) {
             if (msg.what==1){
+                progressBar.setVisibility(View.GONE);
                 NameBean beans= (NameBean) msg.obj;
                 if (stringList.size()>0)
                     stringList.clear();
@@ -356,10 +368,13 @@ public class ChaXunDialog extends Dialog  {
                 adapter3.notifyDataSetChanged();
 
             }else if (msg.what==2){
+                progressBar.setVisibility(View.GONE);
                 if (stringList.size()>0)
                     stringList.clear();
                 adapter3.notifyDataSetChanged();
                 TastyToast.makeText(context, "没有搜索到", TastyToast.LENGTH_SHORT, TastyToast.INFO).show();
+            }else if (msg.what==5){
+                progressBar.setVisibility(View.GONE);
             }
 
 
