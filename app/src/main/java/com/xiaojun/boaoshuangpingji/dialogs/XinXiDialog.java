@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Environment;
 import android.util.Log;
 import android.view.Gravity;
@@ -13,6 +14,7 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.BaseAdapter;
 import android.widget.Button;
 import android.widget.CheckBox;
@@ -20,8 +22,11 @@ import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.PopupWindow;
 import android.widget.TextView;
+
 
 import com.badoo.mobile.util.WeakHandler;
 import com.bumptech.glide.Glide;
@@ -30,11 +35,14 @@ import com.google.gson.JsonObject;
 import com.sdsmdg.tastytoast.TastyToast;
 import com.xiaojun.boaoshuangpingji.MyApplication;
 import com.xiaojun.boaoshuangpingji.R;
+import com.xiaojun.boaoshuangpingji.adapters.PopupWindowAdapter;
+import com.xiaojun.boaoshuangpingji.adapters.PopupWindowAdapter2;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunBean;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunBeanDao;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunId;
 import com.xiaojun.boaoshuangpingji.beans.BaoCunIdDao;
 import com.xiaojun.boaoshuangpingji.beans.BitmapsBean;
+import com.xiaojun.boaoshuangpingji.beans.BuMenBeans;
 import com.xiaojun.boaoshuangpingji.beans.ChaXunBeans;
 import com.xiaojun.boaoshuangpingji.beans.MenBean;
 import com.xiaojun.boaoshuangpingji.beans.NameBean;
@@ -82,9 +90,9 @@ public class XinXiDialog extends Dialog {
     @BindView(R.id.name)
     EditText name;
     @BindView(R.id.xingbie)
-    EditText xingbie;
+    TextView xingbie;
     @BindView(R.id.renyuanleixing)
-    EditText renyuanleixing;
+    TextView renyuanleixing;
     @BindView(R.id.shoujihaoma)
     EditText shoujihaoma;
     @BindView(R.id.zhiweizhiwu)
@@ -131,6 +139,13 @@ public class XinXiDialog extends Dialog {
     private ZhanHuiAdapter zhanHuiAdapter;
     private List<ZhanhuiBean.ObjectsBean> zhanhuiLists=new ArrayList<>();
     private CheckBox checkBox22;
+    private PopupWindow popupWindow=null;
+    private PopupWindow popupWindow2=null;
+    private PopupWindowAdapter adapterss;
+    private PopupWindowAdapter2 adapterss2;
+    private List<String> stringList=new ArrayList<>();
+    private List<String> stringList2=new ArrayList<>();
+
 
     public XinXiDialog(Context context, int type, MenBean event, NameBean.ObjectsBean objectsBean) {
         super(context, R.style.dialog_style);
@@ -149,7 +164,11 @@ public class XinXiDialog extends Dialog {
         }
         baoCunBean = baoCunBeanDao.load(123456L);
         mHandler = new WeakHandler();
+        stringList2.add("男");
+        stringList2.add("女");
+        stringList2.add("未知");
         setCustomDialog();
+
     }
 
 
@@ -371,7 +390,82 @@ public class XinXiDialog extends Dialog {
                 break;
 
         }
+        xingbie.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View contentView = LayoutInflater.from(context).inflate(R.layout.xiangmu_po_item, null);
+
+                ListView listView = (ListView) contentView.findViewById(R.id.dddddd);
+                adapterss2 = new PopupWindowAdapter2(context, stringList2);
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        xingbie.setText(stringList2.get(position));
+                        popupWindow2.dismiss();
+                    }
+                });
+                listView.setAdapter(adapterss2);
+                popupWindow2 = new PopupWindow(contentView, 200, setListViewHeightBasedOnChildren(listView)>100?100:setListViewHeightBasedOnChildren(listView));
+                popupWindow2.setFocusable(true);//获取焦点
+                popupWindow2.setOutsideTouchable(true);//获取外部触摸事件
+                popupWindow2.setTouchable(true);//能够响应触摸事件
+                popupWindow2.setBackgroundDrawable(new ColorDrawable(0x00000000));//设置背景
+                popupWindow2.showAsDropDown(xingbie, 0, 1);
+
+            }
+        });
+        renyuanleixing.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                View contentView = LayoutInflater.from(context).inflate(R.layout.xiangmu_po_item, null);
+
+                ListView listView = (ListView) contentView.findViewById(R.id.dddddd);
+                adapterss = new PopupWindowAdapter(context, stringList);
+                listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                        renyuanleixing.setText(stringList.get(position));
+                        popupWindow.dismiss();
+                    }
+                });
+                listView.setAdapter(adapterss);
+                popupWindow = new PopupWindow(contentView, 200, setListViewHeightBasedOnChildren(listView)>230?230:setListViewHeightBasedOnChildren(listView));
+                popupWindow.setFocusable(true);//获取焦点
+                popupWindow.setOutsideTouchable(true);//获取外部触摸事件
+                popupWindow.setTouchable(true);//能够响应触摸事件
+                popupWindow.setBackgroundDrawable(new ColorDrawable(0x00000000));//设置背景
+                popupWindow.showAsDropDown(renyuanleixing, 0, 1);
+
+
+            }
+        });
+        link_bumen();
+
         super.setContentView(mView);
+    }
+
+    public int setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) {
+            // pre-condition
+            return 0;
+        }
+
+        int totalHeight = 0;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            // listItem.measure(0, 0);
+            listItem.measure(
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED),
+                    View.MeasureSpec.makeMeasureSpec(0, View.MeasureSpec.UNSPECIFIED));
+            totalHeight += listItem.getMeasuredHeight();
+        }
+
+//        ViewGroup.LayoutParams params = listView.getLayoutParams();
+//        params.height = totalHeight
+//                + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+//        listView.setLayoutParams(params);
+        return totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
     }
 
     public void updataTuPian(BitmapsBean event) {
@@ -1271,5 +1365,69 @@ public class XinXiDialog extends Dialog {
 
     }
 
+    private void link_bumen() {
+
+        //final MediaType JSON=MediaType.parse("application/json; charset=utf-8");
+        //http://192.168.2.4:8080/sign?cmd=getUnSignList&subjectId=jfgsdf
+        OkHttpClient okHttpClient= MyApplication.getOkHttpClient();
+
+
+
+            //    /* form的分割线,自己定义 */
+            //        String boundary = "xx--------------------------------------------------------------xx";
+            RequestBody body = new FormBody.Builder()
+                    .add("companyId",baoCunBean.getMoban()+"")
+                    .add("questionId",baoCunBean.getZhanhuiId())
+                    .build();
+
+            Request.Builder requestBuilder = new Request.Builder()
+                    // .header("Content-Type", "application/json")
+                    .post(body)
+                    .url(baoCunBean.getHoutaiDiZhi() + "/queryAnswerByExhibitionId.do");
+
+            // step 3：创建 Call 对象
+            Call call = okHttpClient.newCall(requestBuilder.build());
+
+            //step 4: 开始异步请求
+            call.enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.d("AllConnects", "请求识别失败" + e.getMessage());
+
+                }
+
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+
+                    Log.d("AllConnects", "请求识别成功" + call.request().toString());
+                    //获得返回体
+                    try {
+
+                        ResponseBody body = response.body();
+                       String ss = body.string().trim();
+                        Log.d("DengJiActivity", ss+"部门查询");
+
+                        JsonObject jsonObject = GsonUtil.parse(ss).getAsJsonObject();
+                        Gson gson = new Gson();
+                        BuMenBeans zhaoPianBean = gson.fromJson(jsonObject, BuMenBeans.class);
+                        int size=zhaoPianBean.getObjects().size();
+                        if (stringList.size()>0){
+                            stringList.clear();
+                        }
+                        for (int i=0;i<size;i++){
+                            stringList.add(zhaoPianBean.getObjects().get(i).getAnswer());
+                        }
+//                        Collections.reverse(stringList); // 倒序排列
+
+                    } catch (Exception e) {
+
+
+                        Log.d("WebsocketPushMsg", e.getMessage());
+                    }
+                }
+            });
+
+
+    }
 
 }
